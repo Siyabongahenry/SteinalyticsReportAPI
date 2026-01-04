@@ -20,7 +20,7 @@ app.add_middleware(
     allow_methods=["*"],            # GET, POST, PUT, DELETE, etc.
     allow_headers=["*"],            # Allow all headers
 )
-#incorrect vip codes validation router
+
 app.include_router(vip_validation_router.router)
 app.include_router(overbooking_identify_router.router)
 app.include_router(lookup_router.router)

@@ -22,6 +22,7 @@ def lookup(
     Rules:
     - First uploaded file is the main table
     - All other files are LEFT JOINED
+    - join_by_column must exist in **all uploaded files**
     """
 
     # Ensure at least two files are uploaded
@@ -54,6 +55,13 @@ def lookup(
                 raise HTTPException(
                     status_code=400,
                     detail=f"Unsupported file type: {file.filename}"
+                )
+
+            # Validate that the join column exists in the current file
+            if join_by_column not in df.columns:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Column '{join_by_column}' not found in file: {file.filename}"
                 )
 
             # Store the DataFrame
