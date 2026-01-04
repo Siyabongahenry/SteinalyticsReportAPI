@@ -4,10 +4,7 @@ from io import BytesIO
 from typing import Set
 
 
-async def load_excel_file(
-    file: UploadFile,
-    required_columns: Set[str],
-) -> pd.DataFrame:
+async def load_excel_file( file: UploadFile,required_columns: Set[str],) -> pd.DataFrame:
     """
     Load an uploaded Excel (.xlsx) file into a pandas DataFrame.
 

@@ -9,7 +9,7 @@ router = APIRouter(prefix="/overbooking", tags=["Overbooking Validation"])
 
 
 @router.post("/overbooking")
-async def duplicate(file: UploadFile = File(...)):
+async def overbooking(file: UploadFile = File(...)):
     """
     Validate duplicate and overbooked time entries from an uploaded Excel file.
 
@@ -25,7 +25,7 @@ async def duplicate(file: UploadFile = File(...)):
     # Ensures required columns exist before processing
     df = await load_excel_file(
         file,
-        required_columns={"Work Date", "VIP Codes"},
+        required_columns={"Entry No.","Resource     no.", "VIP Code","Hours worked","Applies-To Entry"},
     )
 
     # Remove reversed or invalid accounting entries
