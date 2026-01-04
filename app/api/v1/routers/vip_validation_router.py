@@ -6,7 +6,7 @@ from app.utils.export_utils import export_excel_and_get_url
 from pathlib import Path
 
 # Create a router dedicated to VIP-related validation endpoints
-router = APIRouter(prefix="/vip", tags=["VIP Validation"])
+router = APIRouter(prefix="/validate-and-export", tags=["VIP Validation"])
 
 # Resolve the base directory of the project
 # parents[3] is used to navigate from this file to the project root
@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parents[3]
 CONFIG_PATH = BASE_DIR / "core" / "vipcodes.json"
 
 
-@router.post("/validate-and-export")
+@router.post("/")
 async def validate_and_export(file: UploadFile = File(...)):
     """
     Validate VIP codes from an uploaded Excel file and export incorrect entries.
