@@ -5,6 +5,8 @@ from io import BytesIO
 
 from app.services.lookup_service import LookupService
 
+from app.utils.export_utils import export_excel_and_get_url
+
 # Create a router with a prefix and tag
 router = APIRouter(
     prefix="/lookup",
@@ -83,9 +85,16 @@ def lookup(
     # Perform the LEFT JOIN operation
     final_df = service.join_reports()
 
-    # Return the result as JSON
+   # Export validation results to Excel and generate download URL
+    download_url = export_excel_and_get_url(
+        sheets={
+            "output": final_df,
+        },
+        prefix="output",
+        filename_prefix="xlookup_output",
+    )
+
+    # Return summary and download link
     return {
-        "rows": len(final_df),                      # Total number of rows
-        "columns": list(final_df.columns),          # Column names
-        "data": final_df.to_dict(orient="records")  # Table data
+        "download_url": download_url,
     }
