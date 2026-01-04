@@ -8,8 +8,7 @@ app = FastAPI()
 # Allow requests from specific origins (frontend URLs)
 origins = [
     "http://localhost:5173",   # React dev
-    "https://steinalytics.takemali.com"   # Production frontend
-    "https://steinalytics.com"   # Production frontend
+    "https://steinalytics.co.za"   # Production frontend
 ]
 
 app.add_middleware(

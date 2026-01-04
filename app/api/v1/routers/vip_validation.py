@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 from app.services.incorrect_vip_service import IncorrectVIPService
-from app.utils.helper_utils import remove_reversed_entries
+from app.utils.reversed_entries_utils import remove_reversed_entries
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
 from pathlib import Path
