@@ -6,7 +6,7 @@ class MultipleClockigsService:
     def getMultipleClockings(self):
         occurrence_count = (
             self.df
-            .groupby(["Clock no.", "date"])
+            .groupby(["Clock No.","Date"])
             .transform("size")
         )
 
