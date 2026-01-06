@@ -25,10 +25,10 @@ class ExemptionService:
         grouped = grouped[grouped["Hours worked"] > 72].copy()
         
         # Add exemption and excess columns
-        grouped["Exemption: 72"] = 72
+        grouped["Exemption"] = 72
         grouped["Excess"] = grouped["Hours worked"] - 72
         
-        return grouped[["Resource no.", "Week", "Exemption: 72", "Excess"]]
+        return grouped[["Resource no.", "Week", "Exemption", "Excess"]]
     
     def get_month_exemption(self):
         # First compute weekly excess
@@ -46,9 +46,9 @@ class ExemptionService:
         )
         
         # Add exemption column (still 72 per week, but monthly we show total excess)
-        monthly["Exemption: 72"] = 72
+        monthly["Exemption"] = 72
         
-        return monthly[["Resource no.", "Month", "Exemption: 72", "Excess"]]
+        return monthly[["Resource no.", "Month", "Exemption", "Excess"]]
     
     def get_exemption(self):
         if self.type == "week":
