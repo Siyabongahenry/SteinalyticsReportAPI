@@ -26,7 +26,7 @@ async def overbooking(file: UploadFile = File(...)):
         file,
         required_columns={
             "Entry No.",
-            "Resource     no.",
+            "Resource no.",
             "VIP Code",
             "Hours worked",
             "Applies-To Entry",
