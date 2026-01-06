@@ -8,7 +8,8 @@ from app.api.v1.routers import (
     overbooking_identify_router,
     lookup_router,
     multiple_clockings_router,
-    exemption_router
+    exemption_router,
+    devices_router
 )
 
 
@@ -30,6 +31,7 @@ app.include_router(overbooking_identify_router.router)
 app.include_router(lookup_router.router)
 app.include_router(multiple_clockings_router.router)
 app.include_router(exemption_router.router)
+app.include_router(devices_router.router)
 
 @app.get("/")
 def read_root():
