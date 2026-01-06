@@ -29,7 +29,7 @@ app.include_router(vip_validation_router.router)
 app.include_router(overbooking_identify_router.router)
 app.include_router(lookup_router.router)
 app.include_router(multiple_clockings_router.router)
-app.include_router(exemption_router)
+app.include_router(exemption_router.router)
 
 @app.get("/")
 def read_root():

@@ -1,4 +1,4 @@
-class MultipleClockigsService:
+class MultipleClockingsService:
 
     def __init__(self, df):
         self.df = df
