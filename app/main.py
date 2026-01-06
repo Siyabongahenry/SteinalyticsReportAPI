@@ -7,7 +7,8 @@ from app.api.v1.routers import (
     vip_validation_router,
     overbooking_identify_router,
     lookup_router,
-    multiple_clockings_router
+    multiple_clockings_router,
+    exemption_router
 )
 
 
@@ -28,6 +29,7 @@ app.include_router(vip_validation_router.router)
 app.include_router(overbooking_identify_router.router)
 app.include_router(lookup_router.router)
 app.include_router(multiple_clockings_router.router)
+app.include_router(exemption_router)
 
 @app.get("/")
 def read_root():
