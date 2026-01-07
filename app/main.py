@@ -1,7 +1,6 @@
-import os
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.settings import settings
 
 #routers import
 from app.api.v1.routers import (
@@ -17,7 +16,7 @@ from app.api.v1.routers import (
 app = FastAPI()
 
 # Allow requests from specific origins (frontend URLs)
-origins = os.getenv("CORS_ORIGINS", "").split(",")
+origins = settings.core_origins.split(",")
 
 app.add_middleware(
     CORSMiddleware,
