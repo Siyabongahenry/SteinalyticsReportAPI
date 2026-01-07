@@ -5,3 +5,6 @@ python-multipart
 pandas
 openpyxl
 holidays
+pydantic-settings
+python-dotenv
+

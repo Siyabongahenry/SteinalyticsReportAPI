@@ -6,8 +6,6 @@ from app.services.excel_export_service import ExcelExportService
 def export_excel_and_get_url(
     sheets: Dict[str, pd.DataFrame],
     *,
-    bucket_name: str,
-    storage_backend: str,
     prefix: str,
     filename_prefix: str,
 ) -> str:
@@ -30,10 +28,7 @@ def export_excel_and_get_url(
     """
 
     # Initialize the Excel export service
-    export_service = ExcelExportService(
-        bucket_name=bucket_name,
-        storage_backend=storage_backend,
-    )
+    export_service = ExcelExportService()
 
     # Upload Excel file and receive storage key or file path
     key = export_service.upload_excel(

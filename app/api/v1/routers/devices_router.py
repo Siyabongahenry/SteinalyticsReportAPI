@@ -2,7 +2,10 @@ from fastapi import APIRouter,UploadFile,File
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
 from app.services.device_service import DeviceService
-router = APIRouter(prefix="/devices",tags=["Devices count"])
+
+
+
+router = APIRouter(prefix="/device-clockings",tags=["Devices count"])
 
 @router.post("/")
 async def devices_count(file:UploadFile = File(...)):

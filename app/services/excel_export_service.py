@@ -5,7 +5,7 @@ from io import BytesIO
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict
-import os
+from app.core.settings import settings
 
 
 class ExcelExportService:
@@ -24,8 +24,8 @@ class ExcelExportService:
     def __init__(
         self,
         bucket_name: Optional[str] = None,
-        region: Optional[str] = None,
         storage_backend: Optional[str] = None,
+        region: Optional[str] = None,
         local_export_dir: str = "exports",
     ):
         """
@@ -38,10 +38,10 @@ class ExcelExportService:
         """
 
         # Determine storage backend (env var takes fallback role)
-        self.storage_backend = storage_backend or os.getenv("STORAGE_BACKEND", "local")
+        self.storage_backend = storage_backend or settings.storage_backend
 
-        self.bucket_name = bucket_name
-        self.region = region
+        self.bucket_name = bucket_name or settings.bucket_name
+        self.region = region or settings.region
 
         # Initialize S3 client only when using S3 backend
         if self.storage_backend == "s3":
@@ -152,7 +152,7 @@ class ExcelExportService:
 
         # Upload file to S3
         self.s3.put_object(
-            Bucket=self.bucket_name,
+            Bucket=settings.bucket_name,
             Key=file_key,
             Body=buffer.getvalue(),
             ContentType=(

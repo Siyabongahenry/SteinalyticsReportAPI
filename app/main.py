@@ -2,6 +2,7 @@ import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 #routers import
 from app.api.v1.routers import (
     vip_validation_router,
