@@ -1,8 +1,9 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter,Depends
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
 from app.utils.reversed_entries_utils import remove_reversed_entries
 from app.services.exemption_service import ExemptionService
+from app.dependencies.file_upload_validator import FileUploadValidator
 
 router = APIRouter(
     prefix="/exemption",
@@ -11,12 +12,12 @@ router = APIRouter(
 
 @router.post("/")
 async def exemption_report(
-    file: UploadFile = File(...),
+    contents: bytes = Depends(FileUploadValidator()),
     exemption_type: str = ""
 ):
     # Load and validate the uploaded Excel file
     df = await load_excel_file(
-        file,
+        contents,
         required_columns={
             "Entry No.",
             "Resource no.",

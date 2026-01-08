@@ -1,7 +1,8 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, Depends
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
 from app.services.multiple_clockings_service import MultipleClockingsService 
+from app.dependencies.file_upload_validator import FileUploadValidator
 
 router = APIRouter(
     prefix="/multiple-clockings",
@@ -9,7 +10,7 @@ router = APIRouter(
 )
 
 @router.post("/")
-async def multiple_clockings(file: UploadFile = File(...)):
+async def multiple_clockings(contents: bytes = Depends(FileUploadValidator())):
     """
     Identify multiple clockings from an uploaded Excel file.
 
@@ -21,7 +22,7 @@ async def multiple_clockings(file: UploadFile = File(...)):
     """
 
     df = await load_excel_file(
-        file,
+        contents,
         required_columns={"Clock No.", "Date"},
     )
 

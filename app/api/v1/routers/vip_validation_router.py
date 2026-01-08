@@ -1,8 +1,9 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, Depends
 from app.services.incorrect_vip_service import IncorrectVIPService
 from app.utils.reversed_entries_utils import remove_reversed_entries
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
+from app.dependencies.file_upload_validator import FileUploadValidator
 from pathlib import Path
 
 # Create a router dedicated to VIP-related validation endpoints
@@ -17,7 +18,7 @@ CONFIG_PATH = BASE_DIR / "core" / "vipcodes.json"
 
 
 @router.post("/")
-async def validate_and_export(file: UploadFile = File(...)):
+async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
     """
     Validate VIP codes from an uploaded Excel file and export incorrect entries.
 
@@ -31,7 +32,7 @@ async def validate_and_export(file: UploadFile = File(...)):
     # Load and validate the uploaded Excel file
     # Ensures required columns exist before processing
     df = await load_excel_file(
-        file,
+        contents,
         required_columns={"Entry No.","Resource     no.", "VIP Code","Hours worked","Applies-To Entry"},
     )
 

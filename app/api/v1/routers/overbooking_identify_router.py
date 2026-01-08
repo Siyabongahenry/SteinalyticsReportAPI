@@ -1,8 +1,9 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, Depends
 from app.services.overbooking_service import OverbookingService
 from app.utils.reversed_entries_utils import remove_reversed_entries
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
+from app.dependencies.file_upload_validator import FileUploadValidator
 
 router = APIRouter(
     prefix="/overbooking",
@@ -10,7 +11,7 @@ router = APIRouter(
 )
 
 @router.post("/")
-async def overbooking(file: UploadFile = File(...)):
+async def overbooking(contents: bytes = Depends(FileUploadValidator())):
     """
     Validate duplicate and overbooked time entries from an uploaded Excel file.
 
@@ -23,7 +24,7 @@ async def overbooking(file: UploadFile = File(...)):
     """
 
     df = await load_excel_file(
-        file,
+        contents,
         required_columns={
             "Entry No.",
             "Resource no.",
