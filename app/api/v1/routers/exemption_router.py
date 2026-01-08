@@ -10,7 +10,7 @@ router = APIRouter(
     tags=["Exemption report"]
 )
 
-@router.post("/")
+@router.post("")
 async def exemption_report(
     contents: bytes = Depends(FileUploadValidator()),
     exemption_type: str = ""

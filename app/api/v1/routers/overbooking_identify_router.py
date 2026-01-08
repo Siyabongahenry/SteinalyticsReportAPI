@@ -10,7 +10,7 @@ router = APIRouter(
     tags=["Overbooking Validation"]
 )
 
-@router.post("/")
+@router.post("")
 async def overbooking(contents: bytes = Depends(FileUploadValidator())):
     """
     Validate duplicate and overbooked time entries from an uploaded Excel file.

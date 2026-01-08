@@ -17,7 +17,8 @@ BASE_DIR = Path(__file__).resolve().parents[3]
 CONFIG_PATH = BASE_DIR / "core" / "vipcodes.json"
 
 
-@router.post("/")
+
+@router.post("")
 async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
     """
     Validate VIP codes from an uploaded Excel file and export incorrect entries.

@@ -13,7 +13,7 @@ router = APIRouter(
     tags=["xlookup for multiple reports"]
 )
 
-@router.post("/")
+@router.post("")
 async def lookup(dataframes: List[pd.DataFrame] = Depends(MultiFileValidator())):
     """
     Upload multiple CSV or Excel files and perform a LEFT JOIN.

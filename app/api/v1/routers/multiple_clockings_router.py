@@ -9,7 +9,7 @@ router = APIRouter(
     tags=["multiple clockings report"]
 )
 
-@router.post("/")
+@router.post("")
 async def multiple_clockings(contents: bytes = Depends(FileUploadValidator())):
     """
     Identify multiple clockings from an uploaded Excel file.
