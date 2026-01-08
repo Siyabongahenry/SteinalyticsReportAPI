@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, Depends
 from typing import List
 import pandas as pd
 from io import BytesIO
@@ -6,71 +6,21 @@ from io import BytesIO
 from app.services.lookup_service import LookupService
 from app.utils.export_utils import export_excel_and_get_url
 
+from app.dependencies.multiple_file_validator import MultiFileValidator
+
 router = APIRouter(
     prefix="/lookup",
     tags=["xlookup for multiple reports"]
 )
 
 @router.post("/")
-async def lookup(
-    files: List[UploadFile] = File(...),
-    join_by_column: str = Form(...)
-):
+async def lookup(dataframes: List[pd.DataFrame] = Depends(MultiFileValidator())):
     """
     Upload multiple CSV or Excel files and perform a LEFT JOIN.
-
-    Rules:
-    - First uploaded file is the main table
-    - All other files are LEFT JOINED
-    - join_by_column must exist in all uploaded files
-    - Output is exported to Excel
     """
-
-    if len(files) < 2:
-        raise HTTPException(
-            status_code=400,
-            detail="Upload at least two files"
-        )
-
-    dataframes = []
-
-    for file in files:
-        filename = file.filename.lower()
-
-        try:
-            content = await file.read()
-
-            if filename.endswith(".csv"):
-                df = pd.read_csv(BytesIO(content))
-
-            elif filename.endswith((".xlsx", ".xls")):
-                df = pd.read_excel(BytesIO(content))
-
-            else:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Unsupported file type: {file.filename}"
-                )
-
-            if join_by_column not in df.columns:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Column '{join_by_column}' not found in file: {file.filename}"
-                )
-
-            dataframes.append(df)
-
-        except HTTPException:
-            raise
-        except Exception as e:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Failed to process {file.filename}: {str(e)}"
-            )
-
     service = LookupService(
         df_reports=dataframes,
-        join_by_column=join_by_column
+        join_by_column=dataframes[0].columns[0]  # or pass explicitly if needed
     )
 
     final_df = service.join_reports()
@@ -81,6 +31,4 @@ async def lookup(
         filename_prefix="xlookup_output",
     )
 
-    return {
-        "download_url": download_url,
-    }
+    return {"download_url": download_url}
