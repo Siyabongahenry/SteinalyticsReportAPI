@@ -7,7 +7,7 @@ from app.dependencies.file_upload_validator import FileUploadValidator
 from pathlib import Path
 
 # Create a router dedicated to VIP-related validation endpoints
-router = APIRouter(prefix="/validate-and-export", tags=["VIP Validation"])
+router = APIRouter(prefix="/vip-validation", tags=["VIP Validation"])
 
 # Resolve the base directory of the project
 # parents[3] is used to navigate from this file to the project root
