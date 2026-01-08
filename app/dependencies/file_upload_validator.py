@@ -27,7 +27,4 @@ class FileUploadValidator:
                 detail=f"File too large. Max size is {self.max_size / (1024*1024)} MB."
             )
 
-        # Reset file pointer so downstream code can still read it
-        await file.seek(0)
-
-        return file
+        return contents
