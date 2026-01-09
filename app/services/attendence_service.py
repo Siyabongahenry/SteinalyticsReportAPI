@@ -56,3 +56,35 @@ class AttendanceService:
 
         return attendance
 
+    def get_attendance_by_employee_month(self):
+        """
+        Returns attendance per employee per month.
+
+        Business rules:
+        - 'Clock No.' uniquely identifies an employee
+        - An employee can only attend once per day
+        - Multiple fingerprint scans in a day are ignored
+        - Attendance is counted as number of days present in a month
+        """
+
+        # Work on a copy to avoid modifying the original DataFrame
+        df = self.df.copy()
+
+        # Ensure Date column is in datetime format
+        df["Date"] = pd.to_datetime(df["Date"])
+
+        # Remove duplicate scans so each employee is counted once per day
+        df = df.drop_duplicates(subset=["Clock No.", "Date"])
+
+        # Create a monthly period column from the Date
+        df["month"] = df["Date"].dt.to_period("M")
+
+        # Group by employee and month, then count attendance days
+        attendance = (
+            df
+            .groupby(["Clock No.", "month"])
+            .size()
+            .reset_index(name="attendance_days")
+        )
+
+        return attendance
