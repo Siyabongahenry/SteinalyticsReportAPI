@@ -34,3 +34,32 @@ async def attendence_list(contents: bytes = Depends(FileUploadValidator())):
     return {
         "download_url":download_url
     }
+
+@router.post("/site-summary")
+async def site_summary(contents: bytes = Depends(FileUploadValidator())):
+
+    df = await load_excel_file(
+       contents,
+        required_columns={
+            "Clock No.",
+            "Date",
+            "WTT"
+        },
+     )
+    
+    attendence_service = AttendanceService(df)
+
+    attendence_list = attendence_service.get_summary_by_site()
+
+    download_url = export_excel_and_get_url(
+        sheets={
+            "Attendence_summary":  attendence_list
+        },
+        prefix="Site attendence summary",
+        filename_prefix="site_attence",
+     )
+
+
+    return {
+        "download_url":download_url
+    }
