@@ -34,7 +34,7 @@ async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
     # Ensures required columns exist before processing
     df = await load_excel_file(
         contents,
-        required_columns={"Entry No.","Resource     no.", "VIP Code","Hours worked","Applies-To Entry"},
+        required_columns={"Entry No.","Resource no.", "VIP Code","Hours worked","Applies-To Entry"},
     )
 
     # Remove reversed or invalid accounting entries
