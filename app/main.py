@@ -9,7 +9,8 @@ from app.api.v1.routers import (
     lookup_router,
     multiple_clockings_router,
     exemption_router,
-    devices_router
+    devices_router,
+    attendance_router
 )
 
 
@@ -32,6 +33,7 @@ app.include_router(lookup_router.router)
 app.include_router(multiple_clockings_router.router)
 app.include_router(exemption_router.router)
 app.include_router(devices_router.router)
+app.include_router(attendance_router.router)
 
 @app.get("/")
 def read_root():
