@@ -63,3 +63,40 @@ async def site_summary(contents: bytes = Depends(FileUploadValidator())):
     return {
         "download_url":download_url
     }
+
+@router.post("/employee-attendance-summary")
+async def employee_attendance_summary(contents: bytes = Depends(FileUploadValidator())):
+    """
+    Returns weekly and monthly attendance per employee.
+    Attendance rules:
+    - Clock No. uniquely identifies an employee
+    - One attendance per employee per day
+    - Multiple scans per day are ignored
+    """
+
+    # Load Excel file and validate required columns
+    df = await load_excel_file(
+        contents,
+        required_columns={"Clock No.", "Date", "WTT"},
+    )
+
+    # Initialize the service with the uploaded DataFrame
+    attendance_service = AttendanceService(df)
+
+    # Get weekly and monthly attendance
+    weekly_attendance = attendance_service.get_attendance_by_employee_week()
+    monthly_attendance = attendance_service.get_attendance_by_employee_month()
+
+    # Export both summaries to Excel
+    download_url = export_excel_and_get_url(
+        sheets={
+            "Weekly_attendance": weekly_attendance,
+            "Monthly_attendance": monthly_attendance,
+        },
+        prefix="Employee_attendance_summary",
+        filename_prefix="employee_attendance",
+    )
+
+    return {
+        "download_url": download_url
+    }
