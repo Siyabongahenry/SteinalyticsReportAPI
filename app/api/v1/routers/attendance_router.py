@@ -5,7 +5,7 @@ from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
 
 # Create a FastAPI router for attendance-related endpoints
-router = APIRouter(prefix="attendance", tags="Employees attendance")
+router = APIRouter(prefix="/attendance", tags=["Employees attendance"])
 
 @router.post("/list")
 async def attendence_list(contents: bytes = Depends(FileUploadValidator())):
