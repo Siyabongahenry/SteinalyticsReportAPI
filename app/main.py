@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.settings import settings
+from fastapi.responses import JSONResponse
+from app.utils.exceptions import AuthorizationError
+
 
 #routers import
 from app.api.v1.routers import (
@@ -34,6 +37,13 @@ app.include_router(multiple_clockings_router.router)
 app.include_router(exemption_router.router)
 app.include_router(devices_router.router)
 app.include_router(attendance_router.router)
+
+@app.exception_handler(AuthorizationError)
+def authz_exception_handler(_, __):
+    return JSONResponse(
+        status_code=403,
+        content={"detail": "Forbidden"},
+    )
 
 @app.get("/")
 def read_root():

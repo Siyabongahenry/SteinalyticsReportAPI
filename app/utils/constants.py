@@ -1,0 +1,2 @@
+COGNITO_GROUPS_CLAIM = "cognito:groups"
+DEFAULT_ROLES = []
