@@ -40,8 +40,8 @@ async def productivity_report(contents: bytes = Depends(FileUploadValidator())):
             "Allowance posted":allowance_posted_df,
             "summary": summary_df
         },
-        prefix="duplicate-validation",
-        filename_prefix="duplicate_overbooking",
+        prefix="productivity reporr",
+        filename_prefix="productivity report",
     )
 
     return{
