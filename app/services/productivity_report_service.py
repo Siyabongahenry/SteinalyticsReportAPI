@@ -16,9 +16,9 @@ class ProductivityReportService:
 
         self.df_hours_posted["Posting Date"] = pd.to_datetime(self.df_hours_posted["Posting Date"])
 
-        group = self.df_hours_posted.groupby([ "User Originator", "Posting Date"])["Entry No."].count().reset_index()
+        posted_productive_df = self.df_hours_posted[self.df_hours_posted["VIP Code"].isin([100,110,111,113,114,115,116,117,290,601,602,603,604,700,750,752,801,802,803,804])].copy()
 
-        return group
+        return posted_productive_df.groupby([ "User Originator", "Posting Date"])["Entry No."].count().reset_index()
 
 
 
