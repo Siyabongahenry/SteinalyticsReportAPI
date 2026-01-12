@@ -8,7 +8,8 @@ from app.dependencies.file_upload_validator import FileUploadValidator
 
 router = APIRouter(prefix="/device-clockings",tags=["Devices count"])
 
-@router.post("/")
+
+@router.post("")
 async def devices_count(contents: bytes = Depends(FileUploadValidator())):
      df = await load_excel_file(
        contents,

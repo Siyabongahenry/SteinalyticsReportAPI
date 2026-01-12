@@ -7,7 +7,7 @@ from app.dependencies.file_upload_validator import FileUploadValidator
 from pathlib import Path
 
 # Create a router dedicated to VIP-related validation endpoints
-router = APIRouter(prefix="/validate-and-export", tags=["VIP Validation"])
+router = APIRouter(prefix="/vip-validation", tags=["VIP Validation"])
 
 # Resolve the base directory of the project
 # parents[3] is used to navigate from this file to the project root
@@ -17,7 +17,8 @@ BASE_DIR = Path(__file__).resolve().parents[3]
 CONFIG_PATH = BASE_DIR / "core" / "vipcodes.json"
 
 
-@router.post("/")
+
+@router.post("")
 async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
     """
     Validate VIP codes from an uploaded Excel file and export incorrect entries.
@@ -33,7 +34,7 @@ async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
     # Ensures required columns exist before processing
     df = await load_excel_file(
         contents,
-        required_columns={"Entry No.","Resource     no.", "VIP Code","Hours worked","Applies-To Entry"},
+        required_columns={"Entry No.","Resource no.", "VIP Code","Hours worked","Applies-To Entry"},
     )
 
     # Remove reversed or invalid accounting entries

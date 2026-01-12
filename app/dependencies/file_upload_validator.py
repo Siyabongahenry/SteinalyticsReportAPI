@@ -12,6 +12,7 @@ class FileUploadValidator:
         self.allowed_types = allowed_types
 
     async def __call__(self, file: UploadFile= File(...)):
+
         # ✅ Validate content type
         if file.content_type not in self.allowed_types:
             raise HTTPException(
@@ -26,5 +27,6 @@ class FileUploadValidator:
                 status_code=400,
                 detail=f"File too large. Max size is {self.max_size / (1024*1024)} MB."
             )
+    
 
         return contents
