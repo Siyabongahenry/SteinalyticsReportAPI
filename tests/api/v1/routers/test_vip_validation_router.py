@@ -20,9 +20,9 @@ def file_with_incorrect_vip(tmp_path):
     # Example: VIP code not in config
     df = pd.DataFrame({
         "Entry No.": [1],
-        "Resource no.": ["R001"],
-        "VIP Code": ["INVALID"],  # should trigger incorrect
-        "Hours worked": [8],
+        "Resource no.": ["9000"],
+        "VIP Code": ["900"],  # should trigger incorrect
+        "Hours worked": [8.75],
         "Applies-To Entry": [""],
     })
     return create_excel_file(df)
