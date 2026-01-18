@@ -23,3 +23,21 @@ async def test_load_excel_file_success():
     assert isinstance(result, pd.DataFrame)
     assert list(result.columns) == ["name", "age"]
     assert len(result) == 2
+
+@pytest.mark.asyncio
+async def test_load_excel_file_missing_columns():
+    df = pd.DataFrame({
+        "name": ["Alice"],
+    })
+
+    buffer = BytesIO()
+    df.to_excel(buffer, index=False, engine="openpyxl")
+    contents = buffer.getvalue()
+
+    required_columns = {"name", "age"}
+
+    with pytest.raises(HTTPException) as exc:
+        await load_excel_file(contents, required_columns)
+
+    assert exc.value.status_code == 400
+    assert "Missing required columns" in exc.value.detail
