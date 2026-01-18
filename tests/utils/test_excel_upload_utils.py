@@ -41,3 +41,13 @@ async def test_load_excel_file_missing_columns():
 
     assert exc.value.status_code == 400
     assert "Missing required columns" in exc.value.detail
+
+@pytest.mark.asyncio
+async def test_load_excel_file_invalid_excel():
+    contents = b"not-an-excel-file"
+    required_columns = {"name"}
+
+    with pytest.raises(HTTPException) as exc:
+        await load_excel_file(contents, required_columns)
+
+    assert exc.value.status_code == 400
