@@ -11,4 +11,5 @@ python-jose
 cryptography
 httpx
 pytest
+python-jose[cryptography]
 
