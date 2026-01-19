@@ -1,7 +1,7 @@
 from jose import jwt
-from auth.jwks import get_jwks
+from app.auth.jwks import get_jwks
 from app.core.OIDC_config import OIDC_ISSUER, OIDC_AUDIENCE, OIDC_ALGORITHMS
-from utils.exceptions import AuthenticationError
+from app.utils.exceptions import AuthenticationError
 
 
 async def decode_access_token(token: str) -> dict:
