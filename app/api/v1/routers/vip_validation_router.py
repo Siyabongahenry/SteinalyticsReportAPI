@@ -30,13 +30,15 @@ async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
     4. Export incorrect rows to Excel and return a download URL
     """
 
+    print("VIP Router Reached")
+
     # Load and validate the uploaded Excel file
     # Ensures required columns exist before processing
     df = await load_excel_file(
         contents,
         required_columns={"Entry No.","Resource no.", "VIP Code","Hours worked","Applies-To Entry"},
     )
-
+    print("File converted to a df")
     # Remove reversed or invalid accounting entries
     clean_df = remove_reversed_entries(df)
 
@@ -53,13 +55,14 @@ async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
             "incorrect_rows": 0,
         }
 
+    print("Creating url")
     # Export incorrect VIP rows to Excel and generate a download URL
     download_url = export_excel_and_get_url(
         sheets={"Incorrect VIP Codes": incorrect_df},
         prefix="vip-validation",
         filename_prefix="incorrect_vip",
     )
-
+    print("Url created")
     # Return summary and download link
     return {
         "incorrect_rows": len(incorrect_df),

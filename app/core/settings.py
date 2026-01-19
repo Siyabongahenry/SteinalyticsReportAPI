@@ -1,15 +1,20 @@
+from typing import Optional
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    core_origins: str =""
-    bucket_name: str = "local"
-    storage_backend: str | None = None
-    region: str | None = None
-    oidc_issuer: str =""
-    oidc_audience: str =""
-   
+    # Required strings with defaults
+    core_origins: str = ""
+    storage_backend: str = "local"
+    oidc_issuer: str = ""
+    oidc_audience: str = ""
+
+    # Optional strings (can be None)
+    bucket_name: Optional[str] = None
+    region: Optional[str] = None
 
     class Config:
         env_file = ".env"
+        env_file_encoding = "utf-8"  # Optional: ensures correct encoding
 
+# Instantiate settings
 settings = Settings()
