@@ -23,6 +23,7 @@ app = FastAPI()
 
 origins = [origin.strip() for origin in settings.core_origins.split(",") if origin.strip()]
 
+print(origins)
 
 app.add_middleware(
     CORSMiddleware,
