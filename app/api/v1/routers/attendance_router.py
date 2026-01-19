@@ -3,12 +3,13 @@ from app.services.attendence_service import AttendanceService
 from app.dependencies.file_upload_validator import FileUploadValidator
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
+from app.dependencies.roles import require_role
 
 # Create a FastAPI router for attendance-related endpoints
 router = APIRouter(prefix="/attendance", tags=["Employees attendance"])
 
 @router.post("/list")
-async def attendence_list(contents: bytes = Depends(FileUploadValidator())):
+async def attendence_list(_: None = Depends(require_role("admin")),contents: bytes = Depends(FileUploadValidator())):
     """
     Endpoint: /attendance/list
     Returns a list of unique employee attendances.
