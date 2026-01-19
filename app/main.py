@@ -20,7 +20,9 @@ from app.api.v1.routers import (
 app = FastAPI()
 
 # Allow requests from specific origins (frontend URLs)
-origins = settings.core_origins.split(",")
+
+origins = [origin.strip() for origin in settings.core_origins.split(",") if origin.strip()]
+
 
 app.add_middleware(
     CORSMiddleware,
