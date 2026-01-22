@@ -5,7 +5,7 @@ class DeviceService:
     def clockings_count(self):
         clockings_count = (
             self.df
-            .groupby(["MeterID", "Date"])
+            .groupby(["Clock No.","MeterID", "Date"])
             .size()
             .reset_index(name="Clocking_Count")
         )
