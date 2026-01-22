@@ -2,12 +2,12 @@ class DeviceService:
     def __init__(self, df):
         self.df = df
 
-    def clockings_count(self):
-        clockings_count = (
+    def unique_clocks_per_meter_per_day(self):
+        result = (
             self.df
-            .groupby(["Clock No.","MeterID", "Date"])
-            .size()
-            .reset_index(name="Clocking_Count")
+            .groupby(["MeterID", "Date"])["Clock No."]
+            .nunique()
+            .reset_index(name="Unique_Clock_Count")
         )
 
-        return clockings_count
+        return result
