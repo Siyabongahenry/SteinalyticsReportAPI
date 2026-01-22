@@ -68,9 +68,10 @@ class IncorrectVIPService:
             | incorrect_mon_fri
         )
 
-        # Clean up helper columns
-        result = df.loc[incorrect_mask].drop(
-            columns=["_weekday", "_is_holiday"]
-        )
+    
+        important_cols = ["Entry No.","Resource no.", "Work date", "VIP Code", "_weekday", "_is_holiday","Hours worked","User Originator"]
+
+
+        result = df.loc[incorrect_mask, important_cols]
 
         return result.reset_index(drop=True)
