@@ -28,6 +28,7 @@ async def overbooking(contents: bytes = Depends(FileUploadValidator())):
         required_columns={
             "Entry No.",
             "Resource no.",
+            "Work date",
             "VIP Code",
             "Hours worked",
             "Applies-To Entry",
