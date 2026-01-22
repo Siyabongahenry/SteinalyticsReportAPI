@@ -23,6 +23,14 @@ class IncorrectVIPService:
         df["_weekday"] = df["Work date"].map(get_weekday_number)
         df["_is_holiday"] = df["Work date"].map(is_public_holiday)
 
+
+        weekday_map = { 0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday", 5: "Saturday", 6: "Sunday", }
+
+        df["Day Name"] = df["_weekday"].map(weekday_map)
+
+        # Override with "Holiday" if flagged 
+        df.loc[df["_is_holiday"], "Day Name"] = "Holiday"
+
         # Pre-build allowed code sets
         mon_fri_codes = set(
             self.rules["mon_fri_normal"] + self.rules["mon_fri_overtime"] + self.rules["driver"]
@@ -69,7 +77,7 @@ class IncorrectVIPService:
         )
 
     
-        important_cols = ["Entry No.","Resource no.", "Work date", "VIP Code", "_weekday", "_is_holiday","Hours worked","User Originator"]
+        important_cols = [ "Entry No.", "Resource no.", "Work date","Day Name", "VIP Code", "Hours worked", "User Originator"]
 
 
         result = df.loc[incorrect_mask, important_cols]
