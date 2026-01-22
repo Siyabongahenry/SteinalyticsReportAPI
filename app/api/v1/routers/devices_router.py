@@ -11,6 +11,9 @@ router = APIRouter(prefix="/device-clockings",tags=["Devices count"])
 
 @router.post("")
 async def devices_count(contents: bytes = Depends(FileUploadValidator())):
+     
+     print("device clockings route reached!!")
+
      df = await load_excel_file(
        contents,
         required_columns={

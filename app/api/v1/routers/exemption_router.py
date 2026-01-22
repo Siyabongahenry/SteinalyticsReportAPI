@@ -28,7 +28,7 @@ async def exemption_report(
     )
 
     # Remove reversed or invalid accounting entries
-    clean_df = remove_reversed_entries(df, "week")
+    clean_df = remove_reversed_entries(df)
 
     exemption_service = ExemptionService(clean_df, exemption_type)
     exemption_df = exemption_service.get_exemption()

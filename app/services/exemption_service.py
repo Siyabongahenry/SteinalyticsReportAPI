@@ -1,7 +1,7 @@
 import pandas as pd
 
 class ExemptionService:
-    def __init__(self, df: pd.DataFrame, type: str):
+    def __init__(self, df: pd.DataFrame, type: str="week"):
         self.df = df
         self.type = type
     
