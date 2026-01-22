@@ -14,7 +14,7 @@ async def devices_count(contents: bytes = Depends(FileUploadValidator())):
      df = await load_excel_file(
        contents,
         required_columns={
-            "MeterId",
+            "MeterID",
             "Date",
         },
      )
