@@ -25,12 +25,12 @@ class IncorrectVIPService:
 
         # Pre-build allowed code sets
         mon_fri_codes = set(
-            self.rules["mon_fri_normal"] + self.rules["mon_fri_overtime"]
+            self.rules["mon_fri_normal"] + self.rules["mon_fri_overtime"] + self.rules["driver"]
         )
-        saturday_codes = set(self.rules["saturday_overtime"])
-        sunday_codes = set(self.rules["sunday_overtime"])
+        saturday_codes = set(self.rules["saturday_overtime"] + self.rules["driver"])
+        sunday_codes = set(self.rules["sunday_overtime"] + self.rules["driver"])
         holiday_codes = set(
-            self.rules["holiday_normal"] + self.rules["holiday_overtime"]
+            self.rules["holiday_normal"] + self.rules["holiday_overtime"] + self.rules["driver"]
         )
 
         # Build rule masks (order matters!)
