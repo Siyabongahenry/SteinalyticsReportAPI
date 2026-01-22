@@ -50,7 +50,7 @@ async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
 
     incorrect_df = vip_service_df.find_incorrect_vip()
 
-    incorrect_per_originator = vip_service_df.count_incorrect_entries_per_originator()
+    incorrect_per_originator = vip_service_df.count_incorrect_entries_per_originator(incorrect_df)
     # If no incorrect VIP codes are found, return early
     if incorrect_df.empty:
         return {
