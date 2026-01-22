@@ -48,6 +48,6 @@ def authz_exception_handler(_, __):
         content={"detail": "Forbidden"},
     )
 
-@app.get("/")
+@app.get("/health")
 def read_root():
     return {"message":"Welcome to Steinalytics API"}
