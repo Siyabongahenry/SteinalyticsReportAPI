@@ -3,8 +3,11 @@ class DeviceService:
         self.df = df
 
     def clockings_count(self):
-
-        clockings_count = self.df.groupby(["MeterID","Date"]).size().reset_index("Clocking_Count")
+        clockings_count = (
+            self.df
+            .groupby(["MeterID", "Date"])
+            .size()
+            .reset_index(name="Clocking_Count")
+        )
 
         return clockings_count
-        
