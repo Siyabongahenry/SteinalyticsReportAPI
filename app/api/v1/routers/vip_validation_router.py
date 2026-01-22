@@ -43,11 +43,14 @@ async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
     clean_df = remove_reversed_entries(df)
 
     # Run VIP validation logic using external configuration
-    incorrect_df = IncorrectVIPService(
+    vip_service_df = IncorrectVIPService(
         clean_df,
         CONFIG_PATH,
-    ).find_incorrect_vip()
+    )
 
+    incorrect_df = vip_service_df.find_incorrect_vip()
+
+    incorrect_per_originator = vip_service_df.count_incorrect_entries_per_originator()
     # If no incorrect VIP codes are found, return early
     if incorrect_df.empty:
         return {
@@ -58,13 +61,13 @@ async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
     print("Creating url")
     # Export incorrect VIP rows to Excel and generate a download URL
     download_url = export_excel_and_get_url(
-        sheets={"Incorrect VIP Codes": incorrect_df},
+        sheets={"IncorrectVIPCodes": incorrect_df, "OriginatorEntriesCount":incorrect_per_originator},
         prefix="vip-validation",
         filename_prefix="incorrect_vip",
     )
     print("Url created")
     # Return summary and download link
     return {
-        "incorrect_rows": len(incorrect_df),
+        "data":  incorrect_per_originator.to_dict(orient="records"),
         "download_url": download_url,
     }
