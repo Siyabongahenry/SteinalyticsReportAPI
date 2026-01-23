@@ -42,6 +42,9 @@ async def overbooking(contents: bytes = Depends(FileUploadValidator())):
     duplicated = service.find_duplicates_overtime()
     overbooked = service.find_overbooked_normal_daily()
 
+    duplicate_originator_count = service.count_user_originators(duplicated)
+    overbooking_originator_count = service.count_user_originators(overbooked)
+
     if duplicated.empty and overbooked.empty:
         return {
             "message": "No duplicate or overbooked entries found",
@@ -58,6 +61,9 @@ async def overbooking(contents: bytes = Depends(FileUploadValidator())):
     )
 
     return {
-        "incorrect_rows": len(duplicated) + len(overbooked),
+        "data": {
+            "duplicate_originator_count": duplicate_originator_count.to_dict(orient="records"),
+            "overbooking_originator_count": overbooking_originator_count.to_dict(orient="records"),
+        },
         "download_url": download_url,
     }
