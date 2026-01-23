@@ -60,10 +60,17 @@ async def overbooking(contents: bytes = Depends(FileUploadValidator())):
         filename_prefix="duplicate_overbooking",
     )
 
+    # Return grouped results as an array
     return {
-        "data": {
-            "duplicate_originator_count": duplicate_originator_count.to_dict(orient="records"),
-            "overbooking_originator_count": overbooking_originator_count.to_dict(orient="records"),
-        },
+        "data": [
+            {
+                "type": "duplicate_originator_count",
+                "records": duplicate_originator_count.to_dict(orient="records"),
+            },
+            {
+                "type": "overbooking_originator_count",
+                "records": overbooking_originator_count.to_dict(orient="records"),
+            },
+        ],
         "download_url": download_url,
     }
