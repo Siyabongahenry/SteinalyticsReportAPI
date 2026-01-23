@@ -15,31 +15,47 @@ class OverbookingService:
         }
 
     def find_duplicates_overtime(self):
-        # Only check duplicates among overtime entries
         overtime_df = self.df[self.df["VIP Code"].isin(self.overtime_codes)]
-        return overtime_df[overtime_df.duplicated(
+        duplicates = overtime_df[overtime_df.duplicated(
             subset=["Resource no.", "Work date", "VIP Code", "Hours worked"],
             keep="first"
         )]
+        return duplicates[
+            ["Resource no.", "User Originator", "Work date", "VIP Code", "Hours worked"]
+        ]
 
     def find_overbooked_normal_daily(self):
-        # Filter normal (non-overtime) entries
         norm_df = self.df[~self.df["VIP Code"].isin(self.overtime_codes)].copy()
-
-        # Ensure datetime
         norm_df["Work date"] = pd.to_datetime(norm_df["Work date"])
-
-        # Add week and weekday info
         norm_df["week"] = norm_df["Work date"].dt.to_period("W-SAT")
         norm_df["weekday"] = norm_df["Work date"].dt.weekday
-
-        # Map required hours
         norm_df["required_norm"] = norm_df["weekday"].map(self.daily_required)
-
-        # Compute cumulative hours per resource per day
         norm_df["cum_sum"] = norm_df.groupby(
             ["Resource no.", "Work date"]
         )["Hours worked"].cumsum()
+        overbooked = norm_df[norm_df["cum_sum"] > norm_df["required_norm"]]
+        return overbooked[
+            [
+                "Resource no.",
+                "User Originator",
+                "Work date",
+                "VIP Code",
+                "Hours worked",
+                "cum_sum",
+                "required_norm",
+                "week",
+                "weekday",
+            ]
+        ]
 
-        # Return rows where cumulative exceeds required
-        return norm_df[norm_df["cum_sum"] > norm_df["required_norm"]]
+    def count_user_originators(self, df):
+        """
+        Count how many entries each User Originator has in the given DataFrame.
+        Returns a DataFrame with counts sorted descending.
+        """
+        return (
+            df["User Originator"]
+            .value_counts()
+            .reset_index()
+            .rename(columns={"index": "User Originator", "User Originator": "count"})
+        )

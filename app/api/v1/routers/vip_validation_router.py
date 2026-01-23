@@ -17,7 +17,6 @@ BASE_DIR = Path(__file__).resolve().parents[3]
 CONFIG_PATH = BASE_DIR / "core" / "vipcodes.json"
 
 
-
 @router.post("")
 async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
     """
