@@ -59,3 +59,15 @@ class OverbookingService:
             .reset_index()
             .rename(columns={"index": "User Originator", "User Originator": "count"})
         )
+
+    @staticmethod
+    def  count_user_originators(df) -> pd.DataFrame:
+       
+        counts = (
+            df.groupby("User Originator")
+            .size()
+            .reset_index(name="incorrect_entry_count")
+            .sort_values(by="incorrect_entry_count", ascending=False)
+            .reset_index(drop=True)
+        )
+        return counts
