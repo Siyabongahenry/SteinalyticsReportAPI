@@ -11,6 +11,7 @@ router = APIRouter(prefix="/device-clockings",tags=["Devices count"])
 
 @router.post("")
 async def devices_count(contents: bytes = Depends(FileUploadValidator())):
+
      df = await load_excel_file(
        contents,
         required_columns={
@@ -21,7 +22,7 @@ async def devices_count(contents: bytes = Depends(FileUploadValidator())):
      
      device_service = DeviceService(df)
 
-     clockings_count = device_service.clockings_count()
+     clockings_count = device_service.unique_clocks_per_meter_per_day()
 
      download_url = export_excel_and_get_url(
         sheets={
@@ -33,7 +34,7 @@ async def devices_count(contents: bytes = Depends(FileUploadValidator())):
 
      return {
         "download_url": download_url,
-        "data": clockings_count
+        "data": clockings_count.to_dict(orient="records")
      }
      
 
