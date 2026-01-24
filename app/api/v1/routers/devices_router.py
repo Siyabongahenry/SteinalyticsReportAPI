@@ -3,6 +3,7 @@ from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
 from app.services.device_service import DeviceService
 from app.dependencies.file_upload_validator import FileUploadValidator
+from app.dependencies.roles import require_role
 
 
 
@@ -10,7 +11,7 @@ router = APIRouter(prefix="/device-clockings",tags=["Devices count"])
 
 
 @router.post("")
-async def devices_count(contents: bytes = Depends(FileUploadValidator())):
+async def devices_count(user = Depends(require_role("site-admin")),contents: bytes = Depends(FileUploadValidator())):
 
      df = await load_excel_file(
        contents,
