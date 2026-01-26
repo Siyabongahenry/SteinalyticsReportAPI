@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
@@ -5,6 +6,8 @@ from app.services.device_service import DeviceService
 from app.dependencies.file_upload_validator import FileUploadValidator
 from app.dependencies.roles import require_role
 
+logging.basicConfig(level=logging.INFO) 
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(prefix="/device-clockings",tags=["Devices count"])
@@ -26,6 +29,8 @@ async def devices_count(user=Depends(require_role("site-admin")) ,contents: byte
      clockings_count = device_service.unique_clocks_per_meter_per_day()
 
      user_id = user.get("sub")
+
+     logger.info(f"This is the user id: {user_id}")
 
      download_url = export_excel_and_get_url(
         sheets={
