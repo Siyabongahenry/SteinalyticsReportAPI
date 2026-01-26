@@ -9,7 +9,7 @@ from app.dependencies.roles import require_role
 router = APIRouter(prefix="/attendance", tags=["Employees attendance"])
 
 @router.post("/list")
-async def attendence_list(user = Depends(require_role("admin")),contents: bytes = Depends(FileUploadValidator())):
+async def attendence_list(user = Depends(require_role("site-admin")),contents: bytes = Depends(FileUploadValidator())):
     """
     Endpoint: /attendance/list
     Returns a list of unique employee attendances.

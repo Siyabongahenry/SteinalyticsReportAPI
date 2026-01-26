@@ -13,7 +13,7 @@ router = APIRouter(
 
 @router.post("")
 async def exemption_report(
-    user = Depends(require_role("admin-site")),
+    user = Depends(require_role("site-admin")),
     contents: bytes = Depends(FileUploadValidator()),
     exemption_type: str = ""
 ):
