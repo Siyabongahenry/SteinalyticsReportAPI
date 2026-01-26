@@ -29,6 +29,7 @@ class ExcelExportService:
         storage_backend: Optional[str] = None,
         region: Optional[str] = None,
         local_export_dir: str = "exports",
+        user_id:str = ""
     ):
         """
         Initialize the export service.
@@ -39,6 +40,7 @@ class ExcelExportService:
 
         self.bucket_name = bucket_name or settings.bucket_name
         self.region = region or settings.region
+        self.user_id = user_id
 
         # Initialize S3 client only when using S3 backend
         if self.storage_backend == "s3":
@@ -58,6 +60,7 @@ class ExcelExportService:
         sheets: Dict[str, pd.DataFrame],
         prefix: str = "exports",
         filename_prefix: str = "export",
+        user_id:str=""
     ) -> str:
         """
         Export multiple DataFrames into a single Excel file.
@@ -73,9 +76,9 @@ class ExcelExportService:
         filename = self._generate_filename(filename_prefix)
 
         if self.storage_backend == "s3":
-            return self._upload_to_s3(sheets, prefix, filename)
+            return self._upload_to_s3(sheets, prefix, filename,user_id)
         else:
-            return self._save_locally(sheets, prefix, filename)
+            return self._save_locally(sheets, prefix, filename,user_id)
 
     # -------------------------
     # Internal helpers
@@ -134,8 +137,8 @@ class ExcelExportService:
         buffer.seek(0)
         return buffer
 
-    def _upload_to_s3(self, sheets: Dict[str, pd.DataFrame], prefix: str, filename: str) -> str:
-        file_key = f"{prefix}/{filename}"
+    def _upload_to_s3(self, sheets: Dict[str, pd.DataFrame], prefix: str, filename: str,user_id:str) -> str:
+        file_key = f"{user_id}/{prefix}/{filename}"
         buffer = self._write_excel(sheets)
 
         self.s3.put_object(
@@ -146,8 +149,8 @@ class ExcelExportService:
         )
         return file_key
 
-    def _save_locally(self, sheets: Dict[str, pd.DataFrame], prefix: str, filename: str) -> str:
-        folder = self.local_export_dir / prefix
+    def _save_locally(self, sheets: Dict[str, pd.DataFrame], prefix: str, filename: str,user_id:str) -> str:
+        folder = self.local_export_dir / user_id/ prefix
         folder.mkdir(parents=True, exist_ok=True)
         file_path = folder / filename
 

@@ -3,6 +3,7 @@ from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
 from app.services.multiple_clockings_service import MultipleClockingsService 
 from app.dependencies.file_upload_validator import FileUploadValidator
+from app.dependencies.roles import require_role
 
 router = APIRouter(
     prefix="/multiple-clockings",
@@ -10,7 +11,7 @@ router = APIRouter(
 )
 
 @router.post("")
-async def multiple_clockings(contents: bytes = Depends(FileUploadValidator())):
+async def multiple_clockings(user = Depends(require_role('site-admin')),contents: bytes = Depends(FileUploadValidator())):
     """
     Identify multiple clockings from an uploaded Excel file.
 
@@ -35,11 +36,14 @@ async def multiple_clockings(contents: bytes = Depends(FileUploadValidator())):
             "message": "Multiple clockings not found",
             "multiple_clockings_count": 0,
         }
+    
+    user_id = user.get("sub")
 
     download_url = export_excel_and_get_url(
         sheets={"Multiple clockings": multiple_clockings},
         prefix="multiple-clockings",
         filename_prefix="multiple_clockings",
+        user_id=user_id
     )
 
     return {

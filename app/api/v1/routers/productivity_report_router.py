@@ -4,6 +4,7 @@ from app.dependencies.file_upload_validator import FileUploadValidator
 from app.utils.reversed_entries_utils import remove_reversed_entries
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
+from app.dependencies.roles import require_role
 
 
 from app.services.productivity_report_service import ProductivityReportService
@@ -11,7 +12,7 @@ from app.services.productivity_report_service import ProductivityReportService
 router = APIRouter(prefix="productivity-report",tags=["Productivity report"])
 
 @router.post("")
-async def productivity_report(contents: bytes = Depends(FileUploadValidator())):
+async def productivity_report(user = Depends(require_role("site-admin")),contents: bytes = Depends(FileUploadValidator())):
     
     df = await load_excel_file(
         contents,
@@ -33,6 +34,8 @@ async def productivity_report(contents: bytes = Depends(FileUploadValidator())):
     allowance_posted_df = service.allowance_posted()
     summary_df = service.get_summary()
 
+    user_id = user.get('sub')
+
     download_url = export_excel_and_get_url(
         sheets={
             "Hours worked": hours_worked_df,
@@ -42,6 +45,7 @@ async def productivity_report(contents: bytes = Depends(FileUploadValidator())):
         },
         prefix="productivity reporr",
         filename_prefix="productivity report",
+        user_id = user_id
     )
 
     return{

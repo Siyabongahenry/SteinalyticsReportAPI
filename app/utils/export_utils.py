@@ -8,6 +8,7 @@ def export_excel_and_get_url(
     *,
     prefix: str,
     filename_prefix: str,
+    user_id
 ) -> str:
     """
     Export one or more pandas DataFrames to an Excel file and return a download URL.
@@ -35,6 +36,7 @@ def export_excel_and_get_url(
         sheets=sheets,
         prefix=prefix,
         filename_prefix=filename_prefix,
+        user_id = user_id
     )
 
     # Generate and return a downloadable URL for the exported file

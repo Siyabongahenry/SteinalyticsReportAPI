@@ -4,6 +4,7 @@ from app.utils.reversed_entries_utils import remove_reversed_entries
 from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
 from app.dependencies.file_upload_validator import FileUploadValidator
+from app.dependencies.roles import require_role
 
 router = APIRouter(
     prefix="/overbooking",
@@ -11,7 +12,7 @@ router = APIRouter(
 )
 
 @router.post("")
-async def overbooking(contents: bytes = Depends(FileUploadValidator())):
+async def overbooking(user = Depends(require_role("site-admin")),contents: bytes = Depends(FileUploadValidator())):
     """
     Validate duplicate and overbooked time entries from an uploaded Excel file.
 
@@ -50,6 +51,8 @@ async def overbooking(contents: bytes = Depends(FileUploadValidator())):
             "message": "No duplicate or overbooked entries found",
             "incorrect_rows": 0,
         }
+    
+    user_id = user.get("sub")
 
     download_url = export_excel_and_get_url(
         sheets={
@@ -58,6 +61,7 @@ async def overbooking(contents: bytes = Depends(FileUploadValidator())):
         },
         prefix="duplicate-validation",
         filename_prefix="duplicate_overbooking",
+        user_id = user_id
     )
 
     # Return grouped results as an array

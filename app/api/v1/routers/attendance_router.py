@@ -9,7 +9,7 @@ from app.dependencies.roles import require_role
 router = APIRouter(prefix="/attendance", tags=["Employees attendance"])
 
 @router.post("/list")
-async def attendence_list(_: None = Depends(require_role("admin")),contents: bytes = Depends(FileUploadValidator())):
+async def attendence_list(user = Depends(require_role("admin")),contents: bytes = Depends(FileUploadValidator())):
     """
     Endpoint: /attendance/list
     Returns a list of unique employee attendances.
@@ -33,11 +33,15 @@ async def attendence_list(_: None = Depends(require_role("admin")),contents: byt
     # Get the unique attendance list
     attendence_list = attendence_service.get_employees_list()
 
+    user_id = user.get("sub")
+
+
     # Export the attendance list to Excel and get a download URL
     download_url = export_excel_and_get_url(
         sheets={"Attendence_list": attendence_list},
         prefix="Employees attence list",
         filename_prefix="attendance_list",
+        user_id = user_id
     )
 
     # Return the download link to the client

@@ -5,6 +5,7 @@ from app.utils.excel_upload_utils import load_excel_file
 from app.utils.export_utils import export_excel_and_get_url
 from app.dependencies.file_upload_validator import FileUploadValidator
 from pathlib import Path
+from app.dependencies.roles import require_role
 
 # Create a router dedicated to VIP-related validation endpoints
 router = APIRouter(prefix="/vip-validation", tags=["VIP Validation"])
@@ -18,7 +19,7 @@ CONFIG_PATH = BASE_DIR / "core" / "vipcodes.json"
 
 
 @router.post("")
-async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
+async def validate_and_export(user = Depends(require_role('site-admin')),contents: bytes = Depends(FileUploadValidator())):
     """
     Validate VIP codes from an uploaded Excel file and export incorrect entries.
 
@@ -57,12 +58,14 @@ async def validate_and_export(contents: bytes = Depends(FileUploadValidator())):
             "incorrect_rows": 0,
         }
 
-    print("Creating url")
+    user_id = user.get("site-admin")
+    
     # Export incorrect VIP rows to Excel and generate a download URL
     download_url = export_excel_and_get_url(
         sheets={"IncorrectVIPCodes": incorrect_df, "OriginatorEntriesCount":incorrect_per_originator},
         prefix="vip-validation",
         filename_prefix="incorrect_vip",
+        user_id = user_id
     )
     print("Url created")
     # Return summary and download link

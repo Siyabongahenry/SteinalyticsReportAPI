@@ -4,6 +4,7 @@ from app.utils.export_utils import export_excel_and_get_url
 from app.utils.reversed_entries_utils import remove_reversed_entries
 from app.services.exemption_service import ExemptionService
 from app.dependencies.file_upload_validator import FileUploadValidator
+from app.dependencies.roles import require_role
 
 router = APIRouter(
     prefix="/exemption",
@@ -12,6 +13,7 @@ router = APIRouter(
 
 @router.post("")
 async def exemption_report(
+    user = Depends(require_role("admin-site")),
     contents: bytes = Depends(FileUploadValidator()),
     exemption_type: str = ""
 ):
@@ -37,12 +39,15 @@ async def exemption_report(
         return {
             "message": "No exemption exceeded"
         }
+    
+    user_id = user.get("sub")
 
     # Export exemption rows to Excel and generate a download URL
     download_url = export_excel_and_get_url(
         sheets={"Exemption": exemption_df},
         prefix="exemption-report",
         filename_prefix="exemption_report",
+        user_id=user_id
     )
 
     return {
