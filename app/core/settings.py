@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     storage_backend: str = "local"
     oidc_issuer: str = ""
     oidc_audience: str = ""
+    email_organizer_table = ""
 
     # Optional strings (can be None)
     bucket_name: Optional[str] = None
