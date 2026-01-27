@@ -12,4 +12,4 @@ cryptography
 httpx
 pytest
 python-jose[cryptography]
-
+requests

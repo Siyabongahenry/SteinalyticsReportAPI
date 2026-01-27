@@ -15,7 +15,8 @@ from app.api.v1.routers import (
     exemption_router,
     devices_router,
     attendance_router,
-    email_organizer_router
+    email_organizer_router,
+    book_identifier_router
 )
 
 # Configure logging
@@ -56,6 +57,7 @@ app.include_router(exemption_router.router)
 app.include_router(devices_router.router)
 app.include_router(attendance_router.router)
 app.include_router(email_organizer_router.router)
+app.include_router(book_identifier_router.router)
 
 @app.exception_handler(AuthorizationError)
 def authz_exception_handler(_, __):
@@ -64,6 +66,11 @@ def authz_exception_handler(_, __):
         content={"detail": "Forbidden"},
     )
 
-@app.get("/health")
+@app.get("/")
 def read_root():
     return {"message":"Welcome to Steinalytics API"}
+
+@app.get("/health")
+def read_root():
+    return {"message":"The server is healthy"}
+
