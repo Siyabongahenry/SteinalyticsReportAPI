@@ -6,12 +6,9 @@ from app.services.device_service import DeviceService
 from app.dependencies.file_upload_validator import FileUploadValidator
 from app.dependencies.roles import require_role
 
-logging.basicConfig(level=logging.INFO) 
-logger = logging.getLogger(__name__)
-
 
 router = APIRouter(prefix="/device-clockings",tags=["Devices count"])
-
+logger = logging.getLogger("FastAPIApp")
 
 @router.post("")
 async def devices_count(user=Depends(require_role("site-admin")) ,contents: bytes = Depends(FileUploadValidator())):
