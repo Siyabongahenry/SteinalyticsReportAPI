@@ -1,52 +1,94 @@
 import boto3
 import requests
-from typing import Dict, Any
+import re
+from typing import Dict, Any, List
 from app.core.settings import settings
+
+
+ISBN_REGEX = re.compile(
+    r"(97[89][-\s]?\d{1,5}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?\d|"
+    r"\d{9}[\dXx])"
+)
 
 
 class BookIdentifierService:
     def __init__(self, region: str = "us-east-1"):
-        # Initialize AWS Rekognition client
         self.rekognition = boto3.client("rekognition", region_name=region)
-        # Load Google Books API key from environment variable
         self.google_api_key = settings.google_books_api_key
 
-    def extract_text(self, image_bytes: bytes) -> str:
-        """
-        Use AWS Rekognition to detect text from an image.
-        Returns a concatenated string of all detected text blocks.
-        """
+    # --------------------------------------------------
+    # OCR: image → ranked text lines
+    # --------------------------------------------------
+    def extract_lines(self, image_bytes: bytes) -> List[str]:
         response = self.rekognition.detect_text(Image={"Bytes": image_bytes})
-        detected_texts = [d["DetectedText"] for d in response["TextDetections"]]
-        return " ".join(detected_texts)
 
-    def lookup_google_books(self, query: str) -> Dict[str, Any]:
-        """
-        Query Google Books API using OCR text.
-        Returns structured metadata if a match is found.
-        """
+        lines = [
+            d["DetectedText"].strip()
+            for d in response["TextDetections"]
+            if d["Type"] == "LINE" and d["Confidence"] >= 85
+        ]
+
+        # Remove obvious junk
+        lines = [
+            l for l in lines
+            if len(l) >= 4
+            and not l.isupper()
+            and not l.lower().startswith(("the new", "now a", "winner"))
+        ]
+
+        return sorted(lines, key=len, reverse=True)[:8]
+
+    # --------------------------------------------------
+    # ISBN detection (image-only, highest confidence)
+    # --------------------------------------------------
+    def detect_isbn(self, text: str) -> str | None:
+        match = ISBN_REGEX.search(text.replace("ISBN", "").replace(":", ""))
+        return match.group(0).replace("-", "").replace(" ", "") if match else None
+
+    # --------------------------------------------------
+    # Google Books (ISBN)
+    # --------------------------------------------------
+    def lookup_by_isbn(self, isbn: str) -> Dict[str, Any]:
         r = requests.get(
             "https://www.googleapis.com/books/v1/volumes",
-            params={"q": query, "key": self.google_api_key}
+            params={"q": f"isbn:{isbn}", "key": self.google_api_key}
         )
         data = r.json()
-        if "items" in data and data["items"]:
-            book = data["items"][0]["volumeInfo"]
-            return {
-                "title": book.get("title"),
-                "authors": book.get("authors", []),
-                "language": book.get("language"),
-                "categories": book.get("categories", []),
-            }
+
+        if data.get("items"):
+            return self.normalize_google(data["items"][0]["volumeInfo"])
+
         return {}
 
-    def lookup_open_library(self, query: str) -> Dict[str, Any]:
-        """
-        Query Open Library API as a fallback if Google Books has no match.
-        Returns structured metadata if a match is found.
-        """
-        r = requests.get("https://openlibrary.org/search.json", params={"q": query})
+    # --------------------------------------------------
+    # Google Books (Title-only)
+    # --------------------------------------------------
+    def lookup_by_title(self, title: str) -> Dict[str, Any]:
+        r = requests.get(
+            "https://www.googleapis.com/books/v1/volumes",
+            params={
+                "q": f'intitle:"{title}"',
+                "key": self.google_api_key,
+                "maxResults": 1,
+            }
+        )
+
         data = r.json()
+        if data.get("items"):
+            return self.normalize_google(data["items"][0]["volumeInfo"])
+
+        return {}
+
+    # --------------------------------------------------
+    # Open Library fallback
+    # --------------------------------------------------
+    def lookup_open_library(self, title: str) -> Dict[str, Any]:
+        r = requests.get(
+            "https://openlibrary.org/search.json",
+            params={"title": title, "limit": 1}
+        )
+        data = r.json()
+
         if data.get("docs"):
             doc = data["docs"][0]
             return {
@@ -54,25 +96,76 @@ class BookIdentifierService:
                 "authors": doc.get("author_name", []),
                 "language": doc.get("language", []),
                 "categories": doc.get("subject", []),
+                "source": "openlibrary",
             }
+
         return {}
 
-    def identify_book(self, image_bytes: bytes) -> Dict[str, Any]:
-        """
-        Full pipeline:
-        1. Extract text from image using Rekognition.
-        2. Try Google Books API for metadata.
-        3. Fallback to Open Library if no match.
-        Returns a dictionary with title, authors, language, categories.
-        """
-        candidate_text = self.extract_text(image_bytes)
-        book = self.lookup_google_books(candidate_text)
-        if not book:
-            book = self.lookup_open_library(candidate_text)
+    # --------------------------------------------------
+    # Normalize Google Books
+    # --------------------------------------------------
+    def normalize_google(self, book: Dict[str, Any]) -> Dict[str, Any]:
         return {
-            "matched_text": candidate_text,
             "title": book.get("title"),
             "authors": book.get("authors", []),
             "language": book.get("language"),
-            "categories": book.get("categories", [])
+            "categories": book.get("categories", []),
+            "isbn": next(
+                (
+                    i["identifier"]
+                    for i in book.get("industryIdentifiers", [])
+                    if i["type"] in ("ISBN_13", "ISBN_10")
+                ),
+                None,
+            ),
+            "source": "google_books",
+        }
+
+    # --------------------------------------------------
+    # MAIN: image-only identification
+    # --------------------------------------------------
+    def identify_book(self, image_bytes: bytes) -> Dict[str, Any]:
+        lines = self.extract_lines(image_bytes)
+        joined_text = " ".join(lines)
+
+        # 1️⃣ ISBN → near-certain match
+        isbn = self.detect_isbn(joined_text)
+        if isbn:
+            book = self.lookup_by_isbn(isbn)
+            if book:
+                return {
+                    "confidence": 0.95,
+                    "matched_text": isbn,
+                    **book,
+                }
+
+        # 2️⃣ Title inference
+        for line in lines:
+            book = self.lookup_by_title(line)
+            if book:
+                return {
+                    "confidence": 0.75,
+                    "matched_text": line,
+                    **book,
+                }
+
+        # 3️⃣ Open Library fallback
+        for line in lines:
+            book = self.lookup_open_library(line)
+            if book:
+                return {
+                    "confidence": 0.6,
+                    "matched_text": line,
+                    **book,
+                }
+
+        # 4️⃣ Honest failure
+        return {
+            "confidence": 0.0,
+            "matched_text": joined_text,
+            "title": None,
+            "authors": [],
+            "language": None,
+            "categories": [],
+            "source": "none",
         }
