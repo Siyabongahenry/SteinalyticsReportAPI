@@ -1,25 +1,23 @@
-import uuid
-from datetime import datetime
-from fastapi import APIRouter, Depends, UploadFile, File, Form
-from app.dependencies.roles import require_role
+from fastapi import APIRouter, Depends, Form
+from datetime import datetime, timezone
+from app.dependencies.image_upload_validator import ImageUploadValidator
 from app.services.book_service import BookService
+from app.dependencies.roles import require_role
 
 router = APIRouter(prefix="/books", tags=["Books"])
 
 @router.post("/donate")
 async def donate_book(
     user=Depends(require_role("user")),
+    file=Depends(ImageUploadValidator),  # 👈 validated image
     title: str = Form(...),
     author: str = Form(...),
     language: str = Form(...),
     category: str = Form(...),
     isbn: str = Form(...),
-    file: UploadFile = File(...),
 ):
     user_id = user.get("sub")
-    created_at = datetime.utcnow().isoformat()
-    file_ext = file.filename.split(".")[-1]
-    unique_filename = f"{uuid.uuid4()}.{file_ext}"
+    created_at = datetime.now(timezone.utc).isoformat()
 
     service = BookService()
     book = await service.add_book(
@@ -29,7 +27,6 @@ async def donate_book(
         category=category,
         isbn=isbn,
         file=file,
-        filename=unique_filename,
         user_id=user_id,
         created_at=created_at,
     )
