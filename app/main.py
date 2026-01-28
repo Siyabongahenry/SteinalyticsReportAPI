@@ -16,7 +16,8 @@ from app.api.v1.routers import (
     devices_router,
     attendance_router,
     email_organizer_router,
-    book_identifier_router
+    book_identifier_router,
+    book_router
 )
 
 # Configure logging
@@ -58,6 +59,7 @@ app.include_router(devices_router.router)
 app.include_router(attendance_router.router)
 app.include_router(email_organizer_router.router)
 app.include_router(book_identifier_router.router)
+app.include_router(book_router.router)
 
 @app.exception_handler(AuthorizationError)
 def authz_exception_handler(_, __):
