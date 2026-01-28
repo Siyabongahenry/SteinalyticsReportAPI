@@ -1,3 +1,4 @@
+from typing import Union
 from datetime import date, datetime
 import holidays
 
@@ -5,7 +6,7 @@ import holidays
 ZA_HOLIDAYS = holidays.country_holidays("ZA", observed=True)
 
 
-def _parse_date(input_date: date | str) -> date:
+def _parse_date(input_date: Union[date, str]) -> date:
     """
     Internal helper to normalize input into a date object.
     """
@@ -14,7 +15,7 @@ def _parse_date(input_date: date | str) -> date:
     return input_date
 
 
-def get_weekday_number(input_date: date | str) -> int:
+def get_weekday_number(input_date: Union[date, str]) -> int:
     """
     Returns weekday number:
     Monday = 0 ... Sunday = 6
@@ -23,7 +24,7 @@ def get_weekday_number(input_date: date | str) -> int:
     return d.weekday()
 
 
-def is_public_holiday(input_date: date | str) -> bool:
+def is_public_holiday(input_date: Union[date, str]) -> bool:
     """
     Returns True if the date is a South African public holiday,
     otherwise False.
