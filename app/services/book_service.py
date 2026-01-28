@@ -21,14 +21,11 @@ class BookService:
         return f"https://{self.bucket}.s3.amazonaws.com/{filename}"
 
     async def add_book(self, title, author, language, category, isbn, file, user_id):
-        # Generate UUID filename
         file_ext = file.filename.split(".")[-1]
         unique_filename = f"{uuid.uuid4()}.{file_ext}"
 
-        # Upload file to S3
         file_url = await self.upload_to_s3(file, unique_filename)
 
-        # Create metadata item
         item = {
             "id": str(uuid.uuid4()),
             "title": title,
@@ -36,7 +33,7 @@ class BookService:
             "language": language,
             "category": category,
             "isbn": isbn,
-            "file_url": file_url,  # 👈 store URL, not file bytes
+            "file_url": file_url,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "created_by": user_id,
             "status": "available",
@@ -54,3 +51,8 @@ class BookService:
 
     async def delete_book(self, book_id: str):
         self.table.delete_item(Key={"id": book_id})
+
+    async def list_books(self):
+        """Return all books in the table."""
+        response = self.table.scan()
+        return response.get("Items", [])
