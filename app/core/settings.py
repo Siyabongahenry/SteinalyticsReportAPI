@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     email_organizer_table: str = ""
     books_table: str = ""
     google_books_api_key: str = ""
+    library_bucket:str = ""
 
 
     # Optional strings (can be None)
