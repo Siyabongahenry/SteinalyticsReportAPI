@@ -8,7 +8,9 @@ class Settings(BaseSettings):
     oidc_issuer: str = ""
     oidc_audience: str = ""
     email_organizer_table: str = ""
+    books_table: str = ""
     google_books_api_key: str = ""
+
 
     # Optional strings (can be None)
     bucket_name: Optional[str] = None

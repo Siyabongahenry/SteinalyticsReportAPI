@@ -1,9 +1,10 @@
 from typing import List, Dict, Any, Optional
-from app.core.dynamoDB import table  # DynamoDB table reference
+from app.core.dynamoDB import get_table
+from app.core.settings import settings
 
 class EmailOrganizerService:
     def __init__(self, db_table=None):
-        self.table = db_table or table
+        self.table = db_table or get_table(settings.email_organizer_table)
 
     # =======================
     # GROUPS
