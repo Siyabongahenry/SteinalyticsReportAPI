@@ -11,7 +11,7 @@ router = APIRouter(prefix="/books", tags=["Books"])
 # --------------------
 @router.post("/donate")
 async def donate_book(
-    user=Depends(require_role("user")),
+    user=Depends(require_role("site-admin")),
     file=Depends(ImageUploadValidator),
     title: str = Form(...),
     author: str = Form(...),
