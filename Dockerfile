@@ -1,14 +1,14 @@
 FROM python:3.11-slim
 
 # Set working directory
-WORKDIR /app
+WORKDIR /steinalytics
 
 # Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY app .
+COPY app /steinalytics/app
 
 # Expose FastAPI port
 EXPOSE 8000
