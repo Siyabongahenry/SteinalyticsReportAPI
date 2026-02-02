@@ -20,7 +20,6 @@ async def donate_book(
     isbn: str = Form(...),
 ):
     user_id = user.get("sub")
-    created_at = datetime.now(timezone.utc).isoformat()
 
     service = BookService()
     book = await service.add_book(
@@ -31,7 +30,6 @@ async def donate_book(
         isbn=isbn,
         file=file,
         user_id=user_id,
-        created_at=created_at,
     )
     return {"message": "Book donated successfully", "book": book}
 
