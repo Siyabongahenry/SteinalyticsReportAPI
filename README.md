@@ -49,32 +49,32 @@ cd SteinalyticsReportAPI
 python -m venv venv
 source venv/bin/activate
 ```
-# Windows (PowerShell)
+#### Windows (PowerShell)
 ```bash
 python -m venv venv
 venv\Scripts\activate.ps1
 ```
 
-# 3. Install dependencies
+#### 3. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-# 4. Create environment variable file and .gitignore
-# Linux/macOS
+#### 4. Create environment variable file and .gitignore
+#### Linux/macOS
 
 ```bash
 sudo nano .env
 sudo nano .gitignore
 ```
 
-# Windows
+#### Windows
 ```
 notepad .env
 notepad .gitignore
 ```
 
-# Example environment variables
+#### Example environment variables
 ```bash
 REGION=us-east-1
 CORE_ORIGINS=https://www.youdomain.com, https://youdomain.com, https://www.youdomain.co.za
@@ -87,32 +87,32 @@ BOOKS_TABLE="Your DynamoDB book table name"
 LIBRARY_BUCKET="Your bucket name where your books get stored"
 ```
 
-# 5. Run the application
+#### 5. Run the application
 ```bash
 uvicorn app.main:app --reload
 ```
 ---
 ### 🔧 Docker Deployment
 
-# 1. Build the Docker image
+#### 1. Build the Docker image
 ```bash
 docker build -t steinalytics-img .
 ```
-# 2. Run the container
+#### 2. Run the container
 ```
 docker run --env-file .env --name steilytics-container -p 8000:8000 steinalytics-img
 ```
 ---
 ### AWS Deployment using ECS
 
-# 1. Create a repository named steinalytics-api in AWS ECR
-# 2. Create an IAM user with ECR access policy
-# 3. Authenticate Docker with ECR
+#### 1. Create a repository named steinalytics-api in AWS ECR
+#### 2. Create an IAM user with ECR access policy
+#### 3. Authenticate Docker with ECR
 ```bash
 aws ecr get-login-password --region <your-region> \
 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.<your-region>.amazonaws.com
 ```
-# 4. Tag and push the image
+#### 4. Tag and push the image
 ```bash
 docker tag steinalytics-img:latest <account-id>.dkr.ecr.<your-region>.amazonaws.com/steinalytics-img:latest
 docker push <account-id>.dkr.ecr.<your-region>.amazonaws.com/steinalytics-img:latest
@@ -125,19 +125,19 @@ docker push <account-id>.dkr.ecr.<your-region>.amazonaws.com/steinalytics-img:la
 ---
 ### Running on only one Amazon EC2 (Amazon Linux 2023)
 
-# 1. Update the EC2 instance
+#### 1. Update the EC2 instance
 ```bash
 sudo yum update -y
 ```
 
-# 2. Switch to ec2-user and clone the repository
+#### 2. Switch to ec2-user and clone the repository
 ```bash
 cd /home/ec2-user
 git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
 cd SteinalyticsReportAPI
 ```
 
-# 3. Set up Python environment
+#### 3. Set up Python environment
 ```bash
 sudo yum install python3.10 -y
 python3.10 -m venv venv
@@ -145,12 +145,14 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-# 4. Create a systemd service for FastAPI
+#### 4. Create a systemd service for FastAPI
 ```bash
 sudo nano /etc/systemd/system/steinalytics.service
 ```
 
-# Add the following content:
+#### Add the following content:
+
+```bash
 [Unit]
 Description=Steinalytics FastAPI Service
 After=network.target
@@ -163,27 +165,28 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+```
 
-# Save and enable service
+#### Save and enable service
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable steinalytics.service
 sudo systemctl start steinalytics.service
 ```
 
-# 5. Install and configure Nginx
+#### 5. Install and configure Nginx
 ```bash
 sudo yum install nginx -y
 sudo systemctl enable nginx
 sudo systemctl start nginx
 ```
 
-# Configure reverse proxy
+#### Configure reverse proxy
 ```bash
 sudo nano /etc/nginx/conf.d/steinalytics.conf
 ```
 
-# Add the following:
+#### Add the following:
 ```bash
 server {
     listen 80;
@@ -199,40 +202,40 @@ server {
 }
 ```
 
-# Test and reload Nginx
+#### Test and reload Nginx
 ```bash
 sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-# 6. Attach a static IP (Elastic IP)
-# - Allocate an Elastic IP in AWS
-# - Associate it with your EC2 instance
+#### 6. Attach a static IP (Elastic IP)
+#### - Allocate an Elastic IP in AWS
+#### - Associate it with your EC2 instance
 
-# 7. Configure Security Groups
-# - Allow inbound traffic on port 80 (HTTP) from anywhere (0.0.0.0/0)
-# - Optionally allow port 443 (HTTPS) if you plan to add SSL/TLS
+#### 7. Configure Security Groups
+#### - Allow inbound traffic on port 80 (HTTP) from anywhere (0.0.0.0/0)
+#### - Optionally allow port 443 (HTTPS) if you plan to add SSL/TLS
 
-# 8. Update DNS records
-# Point your domain’s A record to the Elastic IP
-# Example:
-# yourdomain.com   A   <Elastic-IP>
-# www.yourdomain.com   A   <Elastic-IP>
+#### 8. Update DNS records
+#### Point your domain’s A record to the Elastic IP
+#### Example:
+#### yourdomain.com   A   <Elastic-IP>
+#### www.yourdomain.com   A   <Elastic-IP>
 
 ---
 ### ⚙️ Running with EC2 + Load Balancer + Auto Scaling (Amazon Linux 2023)
 
-# 1. Create a Security Group
-# - Allow inbound traffic on port 80 (HTTP) and 443 (HTTPS) from the internet (0.0.0.0/0) (to be attached to load balancer)
-# - Create another security group for EC2 instances that allows inbound traffic on port 8000 only from the Load Balancer security group - to be attached to ec2 instance.
+#### 1. Create a Security Group
+#### - Allow inbound traffic on port 80 (HTTP) and 443 (HTTPS) from the internet (0.0.0.0/0) (to be attached to load balancer)
+#### - Create another security group for EC2 instances that allows inbound traffic on port 8000 only from the Load Balancer security group - to be attached to ec2 instance.
 
-# 2. Create an IAM Role for EC2
-# - Go to IAM → Roles → Create Role.
-# - Select EC2 as the trusted entity.
-# - Attach policies for S3 and Dynamodb.
-# - To be attached to your ec2 instnance.
+#### 2. Create an IAM Role for EC2
+#### - Go to IAM → Roles → Create Role.
+#### - Select EC2 as the trusted entity.
+#### - Attach policies for S3 and Dynamodb.
+#### - To be attached to your ec2 instnance.
 
-# 3. Launch an EC2 Instance (to prepare AMI)
+#### 3. Launch an EC2 Instance (to prepare AMI)
 ```bash
 sudo yum update -y
 cd /home/ec2-user
@@ -240,7 +243,7 @@ git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
 cd SteinalyticsReportAPI
 ```
 
-# Install Python and dependencies
+#### Install Python and dependencies
 ```bash
 sudo yum install python3.10 -y
 python3.10 -m venv venv
@@ -248,7 +251,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-# Create a systemd service for FastAPI (skip Nginx since Load Balancer will handle traffic)
+#### Create a systemd service for FastAPI (skip Nginx since Load Balancer will handle traffic)
 ```bash
 sudo nano /etc/systemd/system/steinalytics.service
 ```
@@ -259,46 +262,46 @@ WorkingDirectory=/home/ec2-user/SteinalyticsReportAPI
 ExecStart=/home/ec2-user/SteinalyticsReportAPI/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
 Restart=always
 
-# Enable service
+#### Enable service
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable steinalytics.service
 sudo systemctl start steinalytics.service
 ```
 
-# 4. Create an AMI (Amazon Machine Image)
-# - From the EC2 console, select your configured instance.
-# - Choose "Create Image" to generate an AMI that includes your app and service setup.
+#### 4. Create an AMI (Amazon Machine Image)
+#### - From the EC2 console, select your configured instance.
+#### - Choose "Create Image" to generate an AMI that includes your app and service setup.
 
-# 5. Create a Launch Template
-# - Use the AMI created above.
-# - Attach the IAM role created earlier.
-# - Assign the EC2 security group that allows inbound traffic from the Load Balancer SG on port 8000.
+#### 5. Create a Launch Template
+#### - Use the AMI created above.
+#### - Attach the IAM role created earlier.
+#### - Assign the EC2 security group that allows inbound traffic from the Load Balancer SG on port 8000.
 
-# 6. Create an Auto Scaling Group
-# - Based on the launch template.
-# - Configure desired capacity, min/max instances.
-# - Attach the Auto Scaling Group to a Target Group.
+#### 6. Create an Auto Scaling Group
+#### - Based on the launch template.
+#### - Configure desired capacity, min/max instances.
+#### - Attach the Auto Scaling Group to a Target Group.
 
-# 7. Create a Target Group
-# - Protocol: HTTP
-# - Port: 8000
-# - Target type: Instance
-# - Health checks: HTTP on port 8000
+#### 7. Create a Target Group
+#### - Protocol: HTTP
+#### - Port: 8000
+#### - Target type: Instance
+#### - Health checks: HTTP on port 8000
 
-# 8. Create a Load Balancer
-# - Application Load Balancer (ALB).
-# - Listener ports: 80 (HTTP) and/or 443 (HTTPS).
-# - Attach the Load Balancer security group (allows inbound from internet).
-# - Forward traffic to the Target Group (port 8000).
+#### 8. Create a Load Balancer
+#### - Application Load Balancer (ALB).
+#### - Listener ports: 80 (HTTP) and/or 443 (HTTPS).
+#### - Attach the Load Balancer security group (allows inbound from internet).
+#### - Forward traffic to the Target Group (port 8000).
 
-# 9. Update DNS Records
-# - Point your domain’s A record to the Load Balancer DNS name.
-# Example:
-# yourdomain.com   A   <Load-Balancer-DNS>
-# www.yourdomain.com   A   <Load-Balancer-DNS>
+#### 9. Update DNS Records
+#### - Point your domain’s A record to the Load Balancer DNS name.
+#### Example:
+#### yourdomain.com   A   <Load-Balancer-DNS>
+#### www.yourdomain.com   A   <Load-Balancer-DNS>
 
-# ✅ Your FastAPI app now runs behind a Load Balancer with Auto Scaling.
+#### ✅ Your FastAPI app now runs behind a Load Balancer with Auto Scaling.
 
 
 
