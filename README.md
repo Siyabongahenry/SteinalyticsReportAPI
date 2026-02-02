@@ -66,7 +66,7 @@ This backend service integrates with **AWS Cognito** for authorization and commu
     pip install -r requirements.txt
     ```
 
-4. Create environment variable file and .gitignore
+4. Create .env and .gitignore
     #### Linux/macOS
     
     ```bash
