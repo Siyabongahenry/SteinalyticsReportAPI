@@ -118,10 +118,10 @@ docker tag steinalytics-img:latest <account-id>.dkr.ecr.<your-region>.amazonaws.
 docker push <account-id>.dkr.ecr.<your-region>.amazonaws.com/steinalytics-img:latest
 ```
 ### Running ECS Tasks
-# 1. Ensure your .env file is stored securely in Amazon S3 for ECS tasks.
-# 2. Configure ECS task definitions to load environment variables from S3.
-# 3. Use the pushed image from ECR in your ECS task definition.
-# 4. Set the container port to 8000 and protocol to TCP.
+#### 1. Ensure your .env file is stored securely in Amazon S3 for ECS tasks.
+#### 2. Configure ECS task definitions to load environment variables from S3.
+#### 3. Use the pushed image from ECR in your ECS task definition.
+#### 4. Set the container port to 8000 and protocol to TCP.
 ---
 ### Running on only one Amazon EC2 (Amazon Linux 2023)
 
