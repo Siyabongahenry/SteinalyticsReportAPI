@@ -45,24 +45,34 @@ cd SteinalyticsReportAPI
 ```
 # 2. Create and activate a virtual environment
 # Linux/Mac
+```bash
 python -m venv venv
 source venv/bin/activate
-
+```
 # Windows (PowerShell)
+```bash
 python -m venv venv
 venv\Scripts\activate.ps1
+```
 
 # 3. Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
 # 4. Create environment variable file and .gitignore
 # Linux/macOS
+
+```
 sudo nano .env
 sudo nano .gitignore
+```
 
 # Windows
+```
 notepad .env
 notepad .gitignore
+```
 
 # Example environment variables
 REGION=us-east-1
