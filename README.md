@@ -43,8 +43,8 @@ This backend service integrates with **AWS Cognito** for authorization and commu
 git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
 cd SteinalyticsReportAPI
 ```
-# 2. Create and activate a virtual environment
-# Linux/Mac
+#### 2. Create and activate a virtual environment
+#### Linux/Mac
 ```bash
 python -m venv venv
 source venv/bin/activate
@@ -63,7 +63,7 @@ pip install -r requirements.txt
 # 4. Create environment variable file and .gitignore
 # Linux/macOS
 
-```
+```bash
 sudo nano .env
 sudo nano .gitignore
 ```
@@ -75,6 +75,7 @@ notepad .gitignore
 ```
 
 # Example environment variables
+```bash
 REGION=us-east-1
 CORE_ORIGINS=https://www.youdomain.com, https://youdomain.com, https://www.youdomain.co.za
 STORAGE_BACKEND=local
@@ -84,30 +85,38 @@ OIDC_AUDIENCE="Your cognito id"
 GOOGLE_BOOKS_API_KEY="Your google books API key"
 BOOKS_TABLE="Your DynamoDB book table name"
 LIBRARY_BUCKET="Your bucket name where your books get stored"
+```
 
 # 5. Run the application
+```bash
 uvicorn app.main:app --reload
+```
 ---
 ### 🔧 Docker Deployment
 
 # 1. Build the Docker image
+```bash
 docker build -t steinalytics-img .
-
+```
 # 2. Run the container
+```
 docker run --env-file .env --name steilytics-container -p 8000:8000 steinalytics-img
+```
 ---
 ### AWS Deployment using ECS
 
 # 1. Create a repository named steinalytics-api in AWS ECR
 # 2. Create an IAM user with ECR access policy
 # 3. Authenticate Docker with ECR
+```bash
 aws ecr get-login-password --region <your-region> \
 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.<your-region>.amazonaws.com
-
+```
 # 4. Tag and push the image
+```bash
 docker tag steinalytics-img:latest <account-id>.dkr.ecr.<your-region>.amazonaws.com/steinalytics-img:latest
 docker push <account-id>.dkr.ecr.<your-region>.amazonaws.com/steinalytics-img:latest
-
+```
 ### Running ECS Tasks
 # 1. Ensure your .env file is stored securely in Amazon S3 for ECS tasks.
 # 2. Configure ECS task definitions to load environment variables from S3.
@@ -117,21 +126,29 @@ docker push <account-id>.dkr.ecr.<your-region>.amazonaws.com/steinalytics-img:la
 ### Running on only one Amazon EC2 (Amazon Linux 2023)
 
 # 1. Update the EC2 instance
+```bash
 sudo yum update -y
+```
 
 # 2. Switch to ec2-user and clone the repository
+```bash
 cd /home/ec2-user
 git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
 cd SteinalyticsReportAPI
+```
 
 # 3. Set up Python environment
+```bash
 sudo yum install python3.10 -y
 python3.10 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
 
 # 4. Create a systemd service for FastAPI
+```bash
 sudo nano /etc/systemd/system/steinalytics.service
+```
 
 # Add the following content:
 [Unit]
@@ -148,19 +165,26 @@ Restart=always
 WantedBy=multi-user.target
 
 # Save and enable service
+```bash
 sudo systemctl daemon-reload
 sudo systemctl enable steinalytics.service
 sudo systemctl start steinalytics.service
+```
 
 # 5. Install and configure Nginx
+```bash
 sudo yum install nginx -y
 sudo systemctl enable nginx
 sudo systemctl start nginx
+```
 
 # Configure reverse proxy
+```bash
 sudo nano /etc/nginx/conf.d/steinalytics.conf
+```
 
 # Add the following:
+```bash
 server {
     listen 80;
     server_name yourdomain.com www.yourdomain.com;
@@ -173,10 +197,13 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
+```
 
 # Test and reload Nginx
+```bash
 sudo nginx -t
 sudo systemctl restart nginx
+```
 
 # 6. Attach a static IP (Elastic IP)
 # - Allocate an Elastic IP in AWS
@@ -206,19 +233,25 @@ sudo systemctl restart nginx
 # - To be attached to your ec2 instnance.
 
 # 3. Launch an EC2 Instance (to prepare AMI)
+```bash
 sudo yum update -y
 cd /home/ec2-user
 git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
 cd SteinalyticsReportAPI
+```
 
 # Install Python and dependencies
+```bash
 sudo yum install python3.10 -y
 python3.10 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
 
 # Create a systemd service for FastAPI (skip Nginx since Load Balancer will handle traffic)
+```bash
 sudo nano /etc/systemd/system/steinalytics.service
+```
 
 [Service]
 User=ec2-user
@@ -227,9 +260,11 @@ ExecStart=/home/ec2-user/SteinalyticsReportAPI/venv/bin/uvicorn app.main:app --h
 Restart=always
 
 # Enable service
+```bash
 sudo systemctl daemon-reload
 sudo systemctl enable steinalytics.service
 sudo systemctl start steinalytics.service
+```
 
 # 4. Create an AMI (Amazon Machine Image)
 # - From the EC2 console, select your configured instance.
