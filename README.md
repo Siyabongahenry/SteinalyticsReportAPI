@@ -8,6 +8,8 @@
 A **FastAPI** project designed to automate Excel report generation and management.  
 This backend service integrates with **AWS Cognito** for authorization and communicates with the frontend project **steinalytics-frontend** (ReactJS).
 
+🌐 **Live API Endpoint:** [api.steinalytics.co.za](https://api.steinalytics.co.za)
+
 ---
 
 ## ✨ Features
