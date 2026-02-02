@@ -38,7 +38,7 @@ This backend service integrates with **AWS Cognito** for authorization and commu
 ### 🔧 Local Development
 
 
-#### 1. Clone the repository
+1. Clone the repository
 ```bash
 git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
 cd SteinalyticsReportAPI
