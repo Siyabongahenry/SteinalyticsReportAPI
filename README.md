@@ -72,7 +72,7 @@ This backend service integrates with **AWS Cognito** for authorization and commu
     ```
     notepad .env
     notepad .gitignore
-```
+    ```
 
 5. Required environment variables
     ```bash
