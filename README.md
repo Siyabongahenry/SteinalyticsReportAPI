@@ -208,19 +208,19 @@ This backend service integrates with **AWS Cognito** for authorization and commu
     sudo systemctl restart nginx
     ```
 
-#### 6. Attach a static IP (Elastic IP)
-#### - Allocate an Elastic IP in AWS
-#### - Associate it with your EC2 instance
+6. Attach a static IP (Elastic IP)
+     - Allocate an Elastic IP in AWS
+     - Associate it with your EC2 instance
 
-#### 7. Configure Security Groups
-#### - Allow inbound traffic on port 80 (HTTP) from anywhere (0.0.0.0/0)
-#### - Optionally allow port 443 (HTTPS) if you plan to add SSL/TLS
+7. Configure Security Groups
+     - Allow inbound traffic on port 80 (HTTP) from anywhere (0.0.0.0/0)
+     - Optionally allow port 443 (HTTPS) if you plan to add SSL/TLS
 
-#### 8. Update DNS records
-#### Point your domain’s A record to the Elastic IP
-#### Example:
-#### yourdomain.com   A   <Elastic-IP>
-#### www.yourdomain.com   A   <Elastic-IP>
+8. Update DNS records
+    Point your domain’s A record to the Elastic IP
+    Example:
+    yourdomain.com   A   <Elastic-IP>
+    www.yourdomain.com   A   <Elastic-IP>
 
 ---
 ### ⚙️ Running with EC2 + Load Balancer + Auto Scaling (Amazon Linux 2023)
