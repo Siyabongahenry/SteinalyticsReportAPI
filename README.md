@@ -42,7 +42,7 @@ This backend service integrates with **AWS Cognito** for authorization and commu
 ```bash
 git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
 cd SteinalyticsReportAPI
-
+```
 # 2. Create and activate a virtual environment
 # Linux/Mac
 python -m venv venv
