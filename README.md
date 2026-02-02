@@ -44,12 +44,12 @@ git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
 cd SteinalyticsReportAPI
 ```
 2. Create and activate a virtual environment
-** Linux/Mac **
+   **Linux/Mac**
 ```bash
 python -m venv venv
 source venv/bin/activate
 ```
-** Windows (PowerShell) **
+**Windows (PowerShell)**
 ```bash
 python -m venv venv
 venv\Scripts\activate.ps1
@@ -61,14 +61,14 @@ pip install -r requirements.txt
 ```
 
 4. Create environment variable file and .gitignore
-** Linux/macOS **
+**Linux/macOS**
 
 ```bash
 sudo nano .env
 sudo nano .gitignore
 ```
 
-** Windows **
+**Windows**
 ```
 notepad .env
 notepad .gitignore
@@ -150,7 +150,7 @@ pip install -r requirements.txt
 sudo nano /etc/systemd/system/steinalytics.service
 ```
 
-#### Add the following content:
+**Add the following content:**
 
 ```bash
 [Unit]
@@ -167,7 +167,7 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-** Save and enable service **
+**Save and enable service**
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable steinalytics.service
@@ -181,12 +181,12 @@ sudo systemctl enable nginx
 sudo systemctl start nginx
 ```
 
-** Configure reverse proxy **
+**Configure reverse proxy**
 ```bash
 sudo nano /etc/nginx/conf.d/steinalytics.conf
 ```
 
-** Add the following: **
+**Add the following:**
 ```bash
 server {
     listen 80;
@@ -202,7 +202,7 @@ server {
 }
 ```
 
-** Test and reload Nginx **
+**Test and reload Nginx**
 ```bash
 sudo nginx -t
 sudo systemctl restart nginx
@@ -243,7 +243,7 @@ git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
 cd SteinalyticsReportAPI
 ```
 
-** Install Python and dependencies **
+**Install Python and dependencies**
 ```bash
 sudo yum install python3.10 -y
 python3.10 -m venv venv
@@ -251,7 +251,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-** Create a systemd service for FastAPI (skip Nginx since Load Balancer will handle traffic) **
+**Create a systemd service for FastAPI (skip Nginx since Load Balancer will handle traffic)**
 ```bash
 sudo nano /etc/systemd/system/steinalytics.service
 ```
@@ -262,7 +262,7 @@ WorkingDirectory=/home/ec2-user/SteinalyticsReportAPI
 ExecStart=/home/ec2-user/SteinalyticsReportAPI/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
 Restart=always
 
-** Enable service **
+**Enable service**
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable steinalytics.service
