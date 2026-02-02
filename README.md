@@ -299,11 +299,6 @@ This backend service integrates with **AWS Cognito** for authorization and commu
 
 9. Update DNS Records
  - Point your domain’s A record to the Load Balancer DNS name.
-#### Example:
-#### yourdomain.com   A   <Load-Balancer-DNS>
-#### www.yourdomain.com   A   <Load-Balancer-DNS>
-
-#### ✅ Your FastAPI app now runs behind a Load Balancer with Auto Scaling.
 
 
 
