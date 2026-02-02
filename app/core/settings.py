@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     books_table: str = ""
     google_books_api_key: str = ""
     library_bucket:str = ""
+    cloudfront_domain:str = ""
 
 
     # Optional strings (can be None)
