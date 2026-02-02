@@ -236,38 +236,38 @@ This backend service integrates with **AWS Cognito** for authorization and commu
  - To be attached to your ec2 instnance.
 
 3. Launch an EC2 Instance (to prepare AMI)
-```bash
-sudo yum update -y
-cd /home/ec2-user
-git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
-cd SteinalyticsReportAPI
-```
+    ```bash
+    sudo yum update -y
+    cd /home/ec2-user
+    git clone https://github.com/Siyabongahenry/SteinalyticsReportAPI.git
+    cd SteinalyticsReportAPI
+    ```
+    
+    **Install Python and dependencies**
+    ```bash
+    sudo yum install python3.10 -y
+    python3.10 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    ```
 
-**Install Python and dependencies**
-```bash
-sudo yum install python3.10 -y
-python3.10 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-**Create a systemd service for FastAPI (skip Nginx since Load Balancer will handle traffic)**
-```bash
-sudo nano /etc/systemd/system/steinalytics.service
-```
-
-[Service]
-User=ec2-user
-WorkingDirectory=/home/ec2-user/SteinalyticsReportAPI
-ExecStart=/home/ec2-user/SteinalyticsReportAPI/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
-Restart=always
-
-**Enable service**
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable steinalytics.service
-sudo systemctl start steinalytics.service
-```
+    **Create a systemd service for FastAPI (skip Nginx since Load Balancer will handle traffic)**
+    ```bash
+    sudo nano /etc/systemd/system/steinalytics.service
+    ```
+    
+    [Service]
+    User=ec2-user
+    WorkingDirectory=/home/ec2-user/SteinalyticsReportAPI
+    ExecStart=/home/ec2-user/SteinalyticsReportAPI/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+    Restart=always
+    
+    **Enable service**
+    ```bash
+    sudo systemctl daemon-reload
+    sudo systemctl enable steinalytics.service
+    sudo systemctl start steinalytics.service
+    ```
 
 4. Create an AMI (Amazon Machine Image)
  - From the EC2 console, select your configured instance.
