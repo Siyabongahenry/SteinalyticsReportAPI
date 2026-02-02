@@ -76,7 +76,7 @@ LIBRARY_BUCKET="Your bucket name where your books get stored"
 
 # 5. Run the application
 uvicorn app.main:app --reload
-
+---
 ### 🔧 Docker Deployment
 
 # 1. Build the Docker image
@@ -84,8 +84,8 @@ docker build -t steinalytics-img .
 
 # 2. Run the container
 docker run --env-file .env --name steilytics-container -p 8000:8000 steinalytics-img
-
-### AWS Deployment
+---
+### AWS Deployment using ECS
 
 # 1. Create a repository named steinalytics-api in AWS ECR
 # 2. Create an IAM user with ECR access policy
@@ -102,8 +102,8 @@ docker push <account-id>.dkr.ecr.<your-region>.amazonaws.com/steinalytics-img:la
 # 2. Configure ECS task definitions to load environment variables from S3.
 # 3. Use the pushed image from ECR in your ECS task definition.
 # 4. Set the container port to 8000 and protocol to TCP.
-
-### Running on Amazon EC2 (Amazon Linux 2023)
+---
+### Running on only one Amazon EC2 (Amazon Linux 2023)
 
 # 1. Update the EC2 instance
 sudo yum update -y
@@ -181,7 +181,7 @@ sudo systemctl restart nginx
 # yourdomain.com   A   <Elastic-IP>
 # www.yourdomain.com   A   <Elastic-IP>
 
-
+---
 ### ⚙️ Running with EC2 + Load Balancer + Auto Scaling (Amazon Linux 2023)
 
 # 1. Create a Security Group
