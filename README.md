@@ -16,7 +16,11 @@ This backend service integrates with **AWS Cognito** for authorization and commu
 - FastAPI backend for Excel report automation  
 - AWS Cognito authentication (token received via frontend)  
 - Dockerized deployment with AWS ECR support  
-- Flexible hosting options: EC2 + Nginx + Elastic IP or AMI for autoscaling  
+- Flexible hosting options:
+  - **EC2 + Nginx + Elastic IP** → simple single‑instance hosting with reverse proxy  
+  - **EC2 + AMI + Auto Scaling** → scalable hosting using launch templates, target groups, and load balancer  
+  - **Amazon ECS + ECR** → containerized hosting with task definitions, clusters, services, and integrated load balancing  
+  - **Route 53** → DNS management to point your domain to Elastic IP or Load Balancer  
 - Virtual environment (venv) support for local development  
 
 ---
