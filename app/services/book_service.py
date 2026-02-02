@@ -11,14 +11,22 @@ class BookService:
         self.bucket = settings.library_bucket
 
     async def upload_to_s3(self, file, filename: str) -> str:
-        """Upload file to S3 and return public URL."""
+        """Upload file to S3 and return a pre-signed URL."""
+        # Upload the file without ACLs
         self.s3.upload_fileobj(
             file.file,
             self.bucket,
-            filename,
-            ExtraArgs={"ACL": "public-read"}  # or use signed URLs
+            filename
         )
-        return f"https://{self.bucket}.s3.amazonaws.com/{filename}"
+
+        # Generate a pre-signed URL valid for 1 hour
+        url = self.s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": self.bucket, "Key": filename},
+            ExpiresIn=3600  # 1 hour
+        )
+        return url
+
 
     async def add_book(self, title, author, language, category, isbn, file, user_id):
         file_ext = file.filename.split(".")[-1]
