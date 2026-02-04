@@ -36,7 +36,7 @@ async def productivity_report(user = Depends(require_role("site-admin")),content
 
     user_id = user.get('sub')
 
-    download_url = export_excel_and_get_url(
+    urls = export_excel_and_get_url(
         sheets={
             "Hours worked": hours_worked_df,
             "Productive posted": productive_posted,
@@ -50,7 +50,7 @@ async def productivity_report(user = Depends(require_role("site-admin")),content
 
     return{
         "summary":summary_df,
-        "download_url":download_url
+        "download_url":urls["download_url"]
     }
 
 

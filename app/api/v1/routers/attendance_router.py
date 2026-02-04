@@ -37,7 +37,7 @@ async def attendence_list(user = Depends(require_role("site-admin")),contents: b
 
 
     # Export the attendance list to Excel and get a download URL
-    download_url = export_excel_and_get_url(
+    urls = export_excel_and_get_url(
         sheets={"Attendence_list": attendence_list},
         prefix="Employees attence list",
         filename_prefix="attendance_list",
@@ -45,7 +45,7 @@ async def attendence_list(user = Depends(require_role("site-admin")),contents: b
     )
 
     # Return the download link to the client
-    return {"download_url": download_url}
+    return {"download_url": urls["download_url"]}
 
 @router.post("/site-summary")
 async def site_summary(contents: bytes = Depends(FileUploadValidator())):

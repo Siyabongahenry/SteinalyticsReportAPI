@@ -39,7 +39,7 @@ async def multiple_clockings(user = Depends(require_role('site-admin')),contents
     
     user_id = user.get("sub")
 
-    download_url = export_excel_and_get_url(
+    urls = export_excel_and_get_url(
         sheets={"Multiple clockings": multiple_clockings},
         prefix="multiple-clockings",
         filename_prefix="multiple_clockings",
@@ -48,5 +48,5 @@ async def multiple_clockings(user = Depends(require_role('site-admin')),contents
 
     return {
         "multiple_clockings_count": len(multiple_clockings),
-        "download_url": download_url,
+        "download_url": urls["download_url"],
     }

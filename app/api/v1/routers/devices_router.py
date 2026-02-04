@@ -29,7 +29,7 @@ async def devices_count(user=Depends(require_role("site-admin")) ,contents: byte
 
      logger.info(f"This is the user id: {user_id}")
 
-     download_url = export_excel_and_get_url(
+     urls = export_excel_and_get_url(
         sheets={
             "Device report":  clockings_count,
         },
@@ -39,7 +39,7 @@ async def devices_count(user=Depends(require_role("site-admin")) ,contents: byte
      )
 
      return {
-        "download_url": download_url,
+        "download_url": urls["download_url"],
         "data": clockings_count.to_dict(orient="records")
      }
      

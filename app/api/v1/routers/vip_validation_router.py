@@ -61,7 +61,7 @@ async def validate_and_export(user = Depends(require_role('site-admin')),content
     user_id = user.get("site-admin")
     
     # Export incorrect VIP rows to Excel and generate a download URL
-    download_url = export_excel_and_get_url(
+    urls = export_excel_and_get_url(
         sheets={"IncorrectVIPCodes": incorrect_df, "OriginatorEntriesCount":incorrect_per_originator},
         prefix="vip-validation",
         filename_prefix="incorrect_vip",
@@ -71,5 +71,5 @@ async def validate_and_export(user = Depends(require_role('site-admin')),content
     # Return summary and download link
     return {
         "data":  incorrect_per_originator.to_dict(orient="records"),
-        "download_url": download_url,
+        "download_url": urls["download_url"],
     }

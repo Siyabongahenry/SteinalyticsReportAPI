@@ -54,7 +54,7 @@ async def overbooking(user = Depends(require_role("site-admin")),contents: bytes
     
     user_id = user.get("sub")
 
-    download_url = export_excel_and_get_url(
+    urls = export_excel_and_get_url(
         sheets={
             "Duplicated Overtime": duplicated,
             "Overbooked Normal Daily": overbooked,
@@ -76,5 +76,5 @@ async def overbooking(user = Depends(require_role("site-admin")),contents: bytes
                 "records": overbooking_originator_count.to_dict(orient="records"),
             },
         ],
-        "download_url": download_url,
+        "download_url": urls["download_url"],
     }

@@ -43,7 +43,7 @@ async def exemption_report(
     user_id = user.get("sub")
 
     # Export exemption rows to Excel and generate a download URL
-    download_url = export_excel_and_get_url(
+    urls = export_excel_and_get_url(
         sheets={"Exemption": exemption_df},
         prefix="exemption-report",
         filename_prefix="exemption_report",
@@ -52,5 +52,5 @@ async def exemption_report(
 
     return {
         "message": "Exemption report generated successfully",
-        "download_url": download_url
+        "download_url": urls["download_url"]
     }

@@ -25,10 +25,10 @@ async def lookup(dataframes: List[pd.DataFrame] = Depends(MultiFileValidator()))
 
     final_df = service.join_reports()
 
-    download_url = export_excel_and_get_url(
+    urls = export_excel_and_get_url(
         sheets={"output": final_df},
         prefix="output",
         filename_prefix="xlookup_output",
     )
 
-    return {"download_url": download_url}
+    return {"download_url": urls["download_url"]}
