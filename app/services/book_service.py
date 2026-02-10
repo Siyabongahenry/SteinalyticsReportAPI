@@ -26,7 +26,7 @@ class BookService:
         )
 
         # Return CloudFront-backed public URL
-        return f"{self.books_domain}/{key}"
+        return f"{self.books_domain}/{filename}"
 
 
 
