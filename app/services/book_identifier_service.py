@@ -1,94 +1,86 @@
-import boto3
 import requests
-import re
-from typing import Dict, Any, List
+from typing import Dict, Any, Optional, List
 from app.core.settings import settings
 from app.core.generativeAIConfig import GoogleAIClient
 
 google_ai = GoogleAIClient()
 
-ISBN_REGEX = re.compile(
-    r"(97[89][-\s]?\d{1,5}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?\d|"
-    r"\d{9}[\dXx])"
-)
-
 
 class BookIdentifierService:
-    def __init__(self, region: str = "us-east-1"):
-        self.rekognition = boto3.client("rekognition", region_name=region)
+    def __init__(self):
         self.google_api_key = settings.google_books_api_key
 
     # --------------------------------------------------
-    # OCR: image → ranked text lines
+    # Google Books lookup
     # --------------------------------------------------
-    def extract_lines(self, image_bytes: bytes) -> List[str]:
-        response = self.rekognition.detect_text(Image={"Bytes": image_bytes})
+    def lookup_google(
+        self,
+        title: str,
+        author: Optional[str] = None,
+        publish_date: Optional[str] = None,
+        publisher: Optional[str] = None,
+        language: Optional[str] = None,
+        categories: Optional[List[str]] = None,
+        series: Optional[str] = None,
+        edition: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        query = f'intitle:"{title}"'
+        if author:
+            query += f' inauthor:"{author}"'
+        if publisher:
+            query += f' inpublisher:"{publisher}"'
+        if publish_date:
+            query += f' {publish_date}'
+        if language:
+            query += f' language:{language}'
+        if categories:
+            query += " " + " ".join([f'subject:"{c}"' for c in categories])
+        if series:
+            query += f' "{series}"'
+        if edition:
+            query += f' "{edition}"'
 
-        lines = [
-            d["DetectedText"].strip()
-            for d in response["TextDetections"]
-            if d["Type"] == "LINE" and d["Confidence"] >= 85
-        ]
-
-        # Remove obvious junk
-        lines = [
-            l for l in lines
-            if len(l) >= 4
-            and not l.isupper()
-            and not l.lower().startswith(("the new", "now a", "winner"))
-        ]
-
-        return sorted(lines, key=len, reverse=True)[:8]
-
-    # --------------------------------------------------
-    # ISBN detection (image-only, highest confidence)
-    # --------------------------------------------------
-    def detect_isbn(self, text: str) -> str | None:
-        match = ISBN_REGEX.search(text.replace("ISBN", "").replace(":", ""))
-        return match.group(0).replace("-", "").replace(" ", "") if match else None
-
-    # --------------------------------------------------
-    # Google Books (ISBN)
-    # --------------------------------------------------
-    def lookup_by_isbn(self, isbn: str) -> Dict[str, Any]:
         r = requests.get(
             "https://www.googleapis.com/books/v1/volumes",
-            params={"q": f"isbn:{isbn}", "key": self.google_api_key}
+            params={"q": query, "key": self.google_api_key, "maxResults": 1}
         )
         data = r.json()
 
         if data.get("items"):
             return self.normalize_google(data["items"][0]["volumeInfo"])
-
-        return {}
-
-    # --------------------------------------------------
-    # Google Books (Title-only)
-    # --------------------------------------------------
-    def lookup_by_title(self, title: str) -> Dict[str, Any]:
-        r = requests.get(
-            "https://www.googleapis.com/books/v1/volumes",
-            params={
-                "q": f'intitle:"{title}"',
-                "key": self.google_api_key,
-                "maxResults": 1,
-            }
-        )
-
-        data = r.json()
-        if data.get("items"):
-            return self.normalize_google(data["items"][0]["volumeInfo"])
-
         return {}
 
     # --------------------------------------------------
     # Open Library fallback
     # --------------------------------------------------
-    def lookup_open_library(self, title: str) -> Dict[str, Any]:
-        r = requests.get(
-            "https://openlibrary.org/search.json",
-            params={"title": title, "limit": 1}
-        )
+    def lookup_open_library(
+        self,
+        title: str,
+        author: Optional[str] = None,
+        publish_date: Optional[str] = None,
+        publisher: Optional[str] = None,
+        language: Optional[str] = None,
+        categories: Optional[List[str]] = None,
+        series: Optional[str] = None,
+        edition: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        params = {"title": title, "limit": 1}
+        if author:
+            params["author"] = author
+        if publish_date:
+            params["publish_date"] = publish_date
+        if publisher:
+            params["publisher"] = publisher
+        if language:
+            params["language"] = language
+        if categories:
+            params["subject"] = categories[0]  # Open Library supports one subject filter
+        if series:
+            params["series"] = series
+        if edition:
+            params["edition"] = edition
+
+        r = requests.get("https://openlibrary.org/search.json", params=params)
         data = r.json()
 
         if data.get("docs"):
@@ -98,9 +90,10 @@ class BookIdentifierService:
                 "authors": doc.get("author_name", []),
                 "language": doc.get("language", []),
                 "categories": doc.get("subject", []),
+                "publish_date": doc.get("first_publish_year"),
+                "publisher": doc.get("publisher", [None])[0],
                 "source": "openlibrary",
             }
-
         return {}
 
     # --------------------------------------------------
@@ -112,6 +105,8 @@ class BookIdentifierService:
             "authors": book.get("authors", []),
             "language": book.get("language"),
             "categories": book.get("categories", []),
+            "publish_date": book.get("publishedDate"),
+            "publisher": book.get("publisher"),
             "isbn": next(
                 (
                     i["identifier"]
@@ -124,65 +119,57 @@ class BookIdentifierService:
         }
 
     # --------------------------------------------------
-    # MAIN: image-only identification
+    # MAIN: metadata-only identification
     # --------------------------------------------------
-    def identify_book(self, image_bytes: bytes) -> Dict[str, Any]:
-        lines = self.extract_lines(image_bytes)
-        joined_text = " ".join(lines)
+    def identify_book(
+        self,
+        title: str,
+        author: Optional[str] = None,
+        isbn: Optional[str] = None,
+        publish_date: Optional[str] = None,
+        publisher: Optional[str] = None,
+        language: Optional[str] = None,
+        categories: Optional[List[str]] = None,
+        series: Optional[str] = None,
+        edition: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        # Try Google Books first
+        book = self.lookup_google(title, author, publish_date, publisher, language, categories, series, edition)
+        if book:
+            return {"confidence": 0.9, **book}
 
-        # 1️⃣ ISBN → near-certain match
-        isbn = self.detect_isbn(joined_text)
-        if isbn:
-            book = self.lookup_by_isbn(isbn)
-            if book:
-                return {
-                    "confidence": 0.95,
-                    "matched_text": isbn,
-                    **book,
-                }
+        # Fallback to Open Library
+        book = self.lookup_open_library(title, author, publish_date, publisher, language, categories, series, edition)
+        if book:
+            return {"confidence": 0.7, **book}
 
-        # 2️⃣ Title inference
-        for line in lines:
-            book = self.lookup_by_title(line)
-            if book:
-                return {
-                    "confidence": 0.75,
-                    "matched_text": line,
-                    **book,
-                }
-
-        # 3️⃣ Open Library fallback
-        for line in lines:
-            book = self.lookup_open_library(line)
-            if book:
-                return {
-                    "confidence": 0.6,
-                    "matched_text": line,
-                    **book,
-                }
-
-        # 4️⃣ Honest failure
+        # Failure
         return {
             "confidence": 0.0,
-            "matched_text": joined_text,
-            "title": None,
-            "authors": [],
-            "language": None,
-            "categories": [],
+            "title": title,
+            "authors": [author] if author else [],
+            "publish_date": publish_date,
+            "publisher": publisher,
+            "language": language,
+            "categories": categories or [],
+            "series": series,
+            "edition": edition,
             "source": "none",
         }
-    
-    def describe_book(title: str = None, author: str = None, sbn: str = None):
-        if not title and not author:
-            return {"error": "Provide either a title or an author"}
+
+    # --------------------------------------------------
+    # Summarize book using AI
+    # --------------------------------------------------
+    def describe_book(self, title: Optional[str] = None, author: Optional[str] = None, isbn: Optional[str] = None):
+        if not title and not author and not isbn:
+            return {"error": "Provide a title, author, or ISBN"}
 
         if title and author:
             prompt = f"Summarize the book '{title}' by {author}."
-        elif sbn:
-            prompt = f"Summarize the book SBN '{sbn}'."
+        elif isbn:
+            prompt = f"Summarize the book with ISBN '{isbn}'."
         else:
-            prompt = f"Summarize a book written by {title}."
+            prompt = f"Summarize the book titled '{title}'."
 
         summary = google_ai.ask(prompt)
-
         return {"summary": summary}
