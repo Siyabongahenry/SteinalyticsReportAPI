@@ -14,10 +14,12 @@ class BookService:
     async def upload_to_s3(self, file, filename: str) -> str:
         """Upload file to S3 and return public CloudFront URL."""
 
+        key = f"books/{filename}"
+
         self.s3.upload_fileobj(
             file.file,
             self.bucket,
-            filename,
+            key,
             ExtraArgs={
                 "ContentType": file.content_type
             }
