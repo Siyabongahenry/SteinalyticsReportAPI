@@ -82,6 +82,7 @@ async def update_book(
     borrowed_at: str = Form(None),
     return_date: str = Form(None),
     waiting_list: str = Form(None),
+    user=Depends(require_role("site-admin"))
 ):
     service = BookService()
     updated = await service.update_book(
@@ -98,7 +99,7 @@ async def update_book(
 # Delete Book
 # --------------------
 @router.delete("/{book_id}")
-async def delete_book(book_id: str):
+async def delete_book(book_id: str,user=Depends(require_role("site-admin"))):
     service = BookService()
     await service.delete_book(book_id)
     return {"message": f"Book {book_id} deleted"}
