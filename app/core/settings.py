@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     google_books_api_key: str = ""
     library_bucket:str = ""
     books_domain:str = ""
+    google_api_key: str = ""
 
 
     # Optional strings (can be None)

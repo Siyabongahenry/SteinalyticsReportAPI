@@ -3,7 +3,9 @@ import requests
 import re
 from typing import Dict, Any, List
 from app.core.settings import settings
+from app.core.generativeAIConfig import GoogleAIClient
 
+google_ai = GoogleAIClient()
 
 ISBN_REGEX = re.compile(
     r"(97[89][-\s]?\d{1,5}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?\d|"
@@ -169,3 +171,18 @@ class BookIdentifierService:
             "categories": [],
             "source": "none",
         }
+    
+    def describe_book(title: str = None, author: str = None, sbn: str = None):
+        if not title and not author:
+            return {"error": "Provide either a title or an author"}
+
+        if title and author:
+            prompt = f"Summarize the book '{title}' by {author}."
+        elif sbn:
+            prompt = f"Summarize the book SBN '{sbn}'."
+        else:
+            prompt = f"Summarize a book written by {title}."
+
+        summary = google_ai.ask(prompt)
+
+        return {"summary": summary}
