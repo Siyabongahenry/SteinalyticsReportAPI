@@ -31,14 +31,14 @@ async def identify_book(file=Depends(ImageUploadValidator)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/describe")
-async def describe_book(title: str = None, author: str = None, sbn: str = None):
+async def describe_book(title: str = None, author: str = None, isbn: str = None):
     try:
        
-        result = service.describe_book(title,author,str,sbn)
+        result = service.describe_book(title = title,author = author, isbn = isbn)
 
         if not result.get("title"):
             return {"message": "No matching book found", "matched_text": result["matched_text"]}
 
-        return result
+        return {"description":result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
