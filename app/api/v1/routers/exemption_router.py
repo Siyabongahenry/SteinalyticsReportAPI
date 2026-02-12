@@ -55,7 +55,7 @@ async def exemption_report(
         "download_url": urls["download_url"]
     }
 
-@router.post("pivoted")
+@router.post("/pivoted")
 async def exemption_report(
     user = Depends(require_role("site-admin")),
     contents: bytes = Depends(FileUploadValidator()),
