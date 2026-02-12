@@ -77,7 +77,7 @@ class ExemptionService:
             productive_df,
             values="Hours worked",
             index="Resource no.",
-            columns="Work Date",
+            columns="Work date",
             aggfunc="sum",
             fill_value=0
         )
@@ -87,7 +87,7 @@ class ExemptionService:
             unproductive_df,
             values="Hours worked",
             index="Resource no.",
-            columns="Work Date",
+            columns="Work date",
             aggfunc="sum",
             fill_value=0
         )
