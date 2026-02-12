@@ -5,8 +5,7 @@ from app.dependencies.image_upload_validator import ImageUploadValidator
 
 router = APIRouter(
     prefix="/books-identifier",
-    tags=["Book Identifier"],
-    dependencies=[Depends(require_role("site-admin"))]
+    tags=["Book Identifier"]
 )
 
 service = BookIdentifierService()
