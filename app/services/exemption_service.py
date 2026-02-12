@@ -1,9 +1,11 @@
 import pandas as pd
 
 class ExemptionService:
-    def __init__(self, df: pd.DataFrame, type: str = "week"):
+    def __init__(self, df: pd.DataFrame, type: str = "week",productive_codes = None, unproductive_codes = None):
         self.df = df.copy()
         self.type = type
+        self.unproductive_codes =unproductive_codes or [101,200,240,250,301,320,350,400,500]
+        self.productive_codes = productive_codes or [100,290,601,602,603,604,700,750,751,801,802,803,804]
         # Ensure "Work date" is date only
         self.df["Work date"] = pd.to_datetime(self.df["Work date"]).dt.date
 
@@ -62,3 +64,45 @@ class ExemptionService:
             return self.get_month_exemption()
         else:
             raise ValueError("Type must be 'week' or 'month'")
+        
+    def get_pivoted_exemption(self):
+        df = self.df.copy()
+
+        # Split into productive and unproductive
+        productive_df = df[df["VIP Code"].isin(self.productive_codes)]
+        unproductive_df = df[df["VIP Code"].isin(self.unproductive_codes)]
+
+        # Pivot productive
+        pivot_productive = pd.pivot_table(
+            productive_df,
+            values="Hours Worked",
+            index="Clock No.",
+            columns="Work Date",
+            aggfunc="sum",
+            fill_value=0
+        )
+
+        # Pivot unproductive
+        pivot_unproductive = pd.pivot_table(
+            unproductive_df,
+            values="Hours Worked",
+            index="Clock No.",
+            columns="Work Date",
+            aggfunc="sum",
+            fill_value=0
+        )
+
+        # Add totals for each pivot
+        pivot_productive["Productive_Total"] = pivot_productive.sum(axis=1)
+        pivot_unproductive["Unproductive_Total"] = pivot_unproductive.sum(axis=1)
+
+        # Left join on index (Clock No.)
+        final_pivot = pivot_productive.join(pivot_unproductive, how="left", lsuffix="_prod", rsuffix="_unprod")
+
+        # Add final total column
+        final_pivot["Final_Total"] = final_pivot["Productive_Total"].fillna(0) + final_pivot["Unproductive_Total"].fillna(0)
+
+        # Filter rows where final total > 72
+        final_pivot = final_pivot[final_pivot["Final_Total"] > 72]
+
+        return final_pivot
