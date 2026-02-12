@@ -13,6 +13,8 @@ def remove_reversed_entries(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Cleaned DataFrame with reversed entries and their targets removed.
     """
+    df["Hours worked"] = pd.to_numeric(df["Hours worked"], errors="coerce")
+
     # Identify reversed entries
     reversed_mask = (df["Hours worked"] < 0) & df["Applies-To Entry"].notnull()
     reversed_entries = df[reversed_mask]

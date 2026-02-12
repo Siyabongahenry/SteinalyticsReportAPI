@@ -67,43 +67,48 @@ class ExemptionService:
         
     def get_pivoted_exemption(self):
         df = self.df.copy()
-
+    
+        # Normalize column names
+        df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+    
+        # Ensure numeric hours
+        df["hours_worked"] = pd.to_numeric(df["hours_worked"], errors="coerce").fillna(0)
+    
+        # Ensure datetime work_date
+        df["work_date"] = pd.to_datetime(df["work_date"], errors="coerce")
+    
         # Split into productive and unproductive
-        productive_df = df[df["VIP Code"].isin(self.productive_codes)]
-        unproductive_df = df[df["VIP Code"].isin(self.unproductive_codes)]
-
+        productive_df = df[df["vip_code"].isin(self.productive_codes)]
+        unproductive_df = df[df["vip_code"].isin(self.unproductive_codes)]
+    
         # Pivot productive
         pivot_productive = pd.pivot_table(
             productive_df,
-            values="Hours Worked",
-            index="Clock No.",
-            columns="Work Date",
+            values="hours_worked",
+            index="resource_no.",
+            columns="work_date",
             aggfunc="sum",
             fill_value=0
         )
-
+    
         # Pivot unproductive
         pivot_unproductive = pd.pivot_table(
             unproductive_df,
-            values="Hours Worked",
-            index="Clock No.",
-            columns="Work Date",
+            values="hours_worked",
+            index="resource_no.",
+            columns="work_date",
             aggfunc="sum",
             fill_value=0
         )
-
-        # Ensure columns are datetime
-        pivot_productive.columns = pd.to_datetime(pivot_productive.columns)
-        pivot_unproductive.columns = pd.to_datetime(pivot_unproductive.columns)
-
+    
         # Group columns into weeks and sum
         weekly_productive = pivot_productive.groupby(pd.Grouper(axis=1, freq="W")).sum()
         weekly_unproductive = pivot_unproductive.groupby(pd.Grouper(axis=1, freq="W")).sum()
-
+    
         # Add weekly totals
         weekly_productive["Productive_Total"] = weekly_productive.sum(axis=1)
         weekly_unproductive["Unproductive_Total"] = weekly_unproductive.sum(axis=1)
-
+    
         # Join side by side
         final_weekly = weekly_productive.join(
             weekly_unproductive,
@@ -111,23 +116,24 @@ class ExemptionService:
             lsuffix="_prod",
             rsuffix="_unprod"
         )
-
+    
         # Add final weekly total
         final_weekly["Final_Total"] = (
             final_weekly["Productive_Total"].fillna(0)
             + final_weekly["Unproductive_Total"].fillna(0)
         )
-
+    
         # Calculate excess hours per week (never negative)
         final_weekly["Excess"] = (final_weekly["Final_Total"] - 72).clip(lower=0)
-
+    
         # Add per-employee grand total of excess across all weeks
-        final_weekly["Total_Excess"] = final_weekly.groupby("Clock No.")["Excess"].transform("sum")
-
+        final_weekly["Total_Excess"] = final_weekly.groupby("resource_no.")["Excess"].transform("sum")
+    
         # Keep only employees who exceeded at least once
-        exceeded_employees = final_weekly.groupby("Clock No.")["Excess"].sum() > 0
+        exceeded_employees = final_weekly.groupby("resource_no.")["Excess"].sum() > 0
         final_weekly = final_weekly.loc[exceeded_employees]
-
+    
         return final_weekly
-
-
+    
+    
+    
