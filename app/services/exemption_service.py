@@ -75,8 +75,8 @@ class ExemptionService:
         # Pivot productive
         pivot_productive = pd.pivot_table(
             productive_df,
-            values="Hours Worked",
-            index="Clock No.",
+            values="Hours worked",
+            index="Resource no.",
             columns="Work Date",
             aggfunc="sum",
             fill_value=0
@@ -85,8 +85,8 @@ class ExemptionService:
         # Pivot unproductive
         pivot_unproductive = pd.pivot_table(
             unproductive_df,
-            values="Hours Worked",
-            index="Clock No.",
+            values="Hours worked",
+            index="Resource no.",
             columns="Work Date",
             aggfunc="sum",
             fill_value=0
@@ -122,10 +122,10 @@ class ExemptionService:
         final_weekly["Excess"] = (final_weekly["Final_Total"] - 72).clip(lower=0)
 
         # Add per-employee grand total of excess across all weeks
-        final_weekly["Total_Excess"] = final_weekly.groupby("Clock No.")["Excess"].transform("sum")
+        final_weekly["Total_Excess"] = final_weekly.groupby("Resource no.")["Excess"].transform("sum")
 
         # Keep only employees who exceeded at least once
-        exceeded_employees = final_weekly.groupby("Clock No.")["Excess"].sum() > 0
+        exceeded_employees = final_weekly.groupby("Resource no.")["Excess"].sum() > 0
         final_weekly = final_weekly.loc[exceeded_employees]
 
         return final_weekly
