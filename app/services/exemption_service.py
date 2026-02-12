@@ -92,17 +92,42 @@ class ExemptionService:
             fill_value=0
         )
 
-        # Add totals for each pivot
-        pivot_productive["Productive_Total"] = pivot_productive.sum(axis=1)
-        pivot_unproductive["Unproductive_Total"] = pivot_unproductive.sum(axis=1)
+        # Ensure columns are datetime
+        pivot_productive.columns = pd.to_datetime(pivot_productive.columns)
+        pivot_unproductive.columns = pd.to_datetime(pivot_unproductive.columns)
 
-        # Left join on index (Clock No.)
-        final_pivot = pivot_productive.join(pivot_unproductive, how="left", lsuffix="_prod", rsuffix="_unprod")
+        # Group columns into weeks and sum
+        weekly_productive = pivot_productive.groupby(pd.Grouper(axis=1, freq="W")).sum()
+        weekly_unproductive = pivot_unproductive.groupby(pd.Grouper(axis=1, freq="W")).sum()
 
-        # Add final total column
-        final_pivot["Final_Total"] = final_pivot["Productive_Total"].fillna(0) + final_pivot["Unproductive_Total"].fillna(0)
+        # Add weekly totals
+        weekly_productive["Productive_Total"] = weekly_productive.sum(axis=1)
+        weekly_unproductive["Unproductive_Total"] = weekly_unproductive.sum(axis=1)
 
-        # Filter rows where final total > 72
-        final_pivot = final_pivot[final_pivot["Final_Total"] > 72]
+        # Join side by side
+        final_weekly = weekly_productive.join(
+            weekly_unproductive,
+            how="left",
+            lsuffix="_prod",
+            rsuffix="_unprod"
+        )
 
-        return final_pivot
+        # Add final weekly total
+        final_weekly["Final_Total"] = (
+            final_weekly["Productive_Total"].fillna(0)
+            + final_weekly["Unproductive_Total"].fillna(0)
+        )
+
+        # Calculate excess hours per week (never negative)
+        final_weekly["Excess"] = (final_weekly["Final_Total"] - 72).clip(lower=0)
+
+        # Add per-employee grand total of excess across all weeks
+        final_weekly["Total_Excess"] = final_weekly.groupby("Clock No.")["Excess"].transform("sum")
+
+        # Keep only employees who exceeded at least once
+        exceeded_employees = final_weekly.groupby("Clock No.")["Excess"].sum() > 0
+        final_weekly = final_weekly.loc[exceeded_employees]
+
+        return final_weekly
+
+
