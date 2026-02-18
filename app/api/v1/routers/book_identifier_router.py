@@ -48,7 +48,7 @@ async def describe_book(book: BookRequest):
 
         result = service.describe_book(title = book.title,author = book.author, isbn = book.isbn)
 
-        logger.info("Results obtained")
+        logger.info(f" {result}")
 
 
         return {"description":result}
