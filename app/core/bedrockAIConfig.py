@@ -32,6 +32,9 @@ class BedrockAIClient:
 
         output = json.loads(response["body"].read())
 
+        # 🔹 Log the raw response so you can inspect the structure 
+        print("Raw Bedrock response:", json.dumps(output, indent=2))
+
         # Claude 3.x returns output under "output" → list of dicts with "content"
         if "output" in output and output["output"]:
             return output["output"][0].get("content", "").strip()
