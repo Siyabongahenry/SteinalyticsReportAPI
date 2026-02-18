@@ -17,12 +17,13 @@ class BedrockAIClient:
         )
 
     def ask(self, prompt: str) -> str:
-        # Claude requires Human/Assistant format
-        formatted_prompt = f'Human: {prompt}\n\nAssistant:'
-
+        # Claude 3.x requires Messages API format
         body = json.dumps({
-            "prompt": formatted_prompt,
-            "max_tokens_to_sample": 512
+            "messages": [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            "max_tokens": 512
         })
 
         response = self.client.invoke_model(
@@ -31,4 +32,8 @@ class BedrockAIClient:
         )
 
         output = json.loads(response["body"].read())
-        return output.get("completion", "").strip()
+
+        # Claude 3.x returns output under "output" → list of dicts with "content"
+        if "output" in output and output["output"]:
+            return output["output"][0].get("content", "").strip()
+        return ""
