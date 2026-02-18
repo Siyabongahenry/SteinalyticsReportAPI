@@ -14,4 +14,4 @@ pytest
 python-jose[cryptography]
 requests
 pillow
-google-generativeai
+google-genai
