@@ -3,6 +3,7 @@ from app.services.book_identifier_service import BookIdentifierService
 from app.dependencies.roles import require_role
 from app.dependencies.image_upload_validator import ImageUploadValidator
 from app.core.logger import logger
+from pydantic import BaseModel
 
 router = APIRouter(
     prefix="/books-identifier",
@@ -10,6 +11,12 @@ router = APIRouter(
 )
 
 service = BookIdentifierService()
+
+class BookRequest(BaseModel):
+     title: str = None
+     author: str = None
+     isbn: str = None
+
 
 @router.post("/identify")
 async def identify_book(file=Depends(ImageUploadValidator)):
@@ -31,15 +38,15 @@ async def identify_book(file=Depends(ImageUploadValidator)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/describe")
-async def describe_book(title: str = None, author: str = None, isbn: str = None):
+async def describe_book(book: BookRequest):
     #try:
 
         logger.info("Describe route reached") 
-        logger.info(f"Received parameters - Title: {title}, Author: {author}, ISBN: {isbn}")
+        logger.info(f"Received parameters - Title: {book.title}, Author: {book.author}, ISBN: {book.isbn}")
 
         logger.info("describe route reached")
 
-        result = service.describe_book(title = title,author = author, isbn = isbn)
+        result = service.describe_book(title = book.title,author = book.author, isbn = book.isbn)
 
         logger.info("Results obtained")
         
