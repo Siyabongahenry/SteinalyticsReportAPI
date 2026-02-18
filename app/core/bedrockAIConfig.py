@@ -4,7 +4,6 @@ from app.core.settings import settings
 
 class BedrockAIClient:
     def __init__(self):
-        # boto3 will use the IAM role attached to your EC2 instance
         self.client = boto3.client(
             service_name="bedrock-runtime",
             region_name=settings.region  # e.g. "us-east-1"
@@ -17,10 +16,9 @@ class BedrockAIClient:
         )
 
     def ask(self, prompt: str) -> str:
-        # Claude 3.x requires Messages API format
         body = json.dumps({
+            "system": "You are a helpful assistant.",
             "messages": [
-                {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
             ],
             "max_tokens": 512
