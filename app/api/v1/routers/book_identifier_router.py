@@ -49,13 +49,6 @@ async def describe_book(book: BookRequest):
         result = service.describe_book(title = book.title,author = book.author, isbn = book.isbn)
 
         logger.info("Results obtained")
-        
-
-        if not result.get("title"):
-            return {
-                "message": "No matching book found",
-                "matched_text": result.get("matched_text", None)
-            }
 
 
         return {"description":result}
