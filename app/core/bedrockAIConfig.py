@@ -17,6 +17,7 @@ class BedrockAIClient:
 
     def ask(self, prompt: str) -> str:
         body = json.dumps({
+            "anthropic_version": "bedrock-2023-05-31",
             "system": "You are a helpful assistant.",
             "messages": [
                 {"role": "user", "content": prompt}
