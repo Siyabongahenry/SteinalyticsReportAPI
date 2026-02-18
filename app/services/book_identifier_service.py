@@ -1,9 +1,9 @@
 import requests
 from typing import Dict, Any, Optional, List
 from app.core.settings import settings
-from app.core.generativeAIConfig import GoogleAIClient
+from app.core.bedrockAIConfig import BedrockAIClient
 
-google_ai = GoogleAIClient()
+bedrock_ai = BedrockAIClient()
 
 
 class BookIdentifierService:
@@ -171,6 +171,6 @@ class BookIdentifierService:
         else:
             prompt = f"Summarize the book titled '{title}'."
 
-        summary = google_ai.ask(prompt)
-        
+        summary = bedrock_ai.ask(prompt)
+
         return {"summary": summary}

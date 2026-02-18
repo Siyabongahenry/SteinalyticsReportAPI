@@ -7,14 +7,12 @@ class GoogleAIClient:
     def __init__(self):
         # Create a client with your API key from settings
         self.client = genai.Client(api_key=settings.google_api_key)
-        for model in self.client.models.list(): 
-            print(model.name)
-            print(model)
+        
 
     def ask(self, prompt: str) -> str:
         # Use the client to generate content
         response = self.client.models.generate_content(
-            model="gemini-1.0-pro",  # free-tier model
+            model="gemini-3-flash-preview",
             contents=prompt
         )
         return response.text.strip()
