@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from app.services.book_identifier_service import BookIdentifierService
 from app.dependencies.roles import require_role
 from app.dependencies.image_upload_validator import ImageUploadValidator
-from app.main import logger
+from app.core.logger import logger
 
 router = APIRouter(
     prefix="/books-identifier",
