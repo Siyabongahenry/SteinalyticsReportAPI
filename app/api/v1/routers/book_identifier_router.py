@@ -52,7 +52,11 @@ async def describe_book(book: BookRequest):
         
 
         if not result.get("title"):
-            return {"message": "No matching book found", "matched_text": result["matched_text"]}
+            return {
+                "message": "No matching book found",
+                "matched_text": result.get("matched_text", None)
+            }
+
 
         return {"description":result}
     #except Exception as e:
