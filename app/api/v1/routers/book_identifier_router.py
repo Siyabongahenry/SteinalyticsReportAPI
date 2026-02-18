@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from app.services.book_identifier_service import BookIdentifierService
 from app.dependencies.roles import require_role
 from app.dependencies.image_upload_validator import ImageUploadValidator
+from app.main import logger
 
 router = APIRouter(
     prefix="/books-identifier",
@@ -32,8 +33,13 @@ async def identify_book(file=Depends(ImageUploadValidator)):
 @router.post("/describe")
 async def describe_book(title: str = None, author: str = None, isbn: str = None):
     try:
-       
+
+        logger.info("describe route reached")
+
         result = service.describe_book(title = title,author = author, isbn = isbn)
+
+        logger.info("Results obtained")
+        
 
         if not result.get("title"):
             return {"message": "No matching book found", "matched_text": result["matched_text"]}
