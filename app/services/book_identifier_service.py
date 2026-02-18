@@ -172,4 +172,5 @@ class BookIdentifierService:
             prompt = f"Summarize the book titled '{title}'."
 
         summary = google_ai.ask(prompt)
+        
         return {"summary": summary}

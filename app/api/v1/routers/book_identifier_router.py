@@ -56,4 +56,5 @@ async def describe_book(book: BookRequest):
 
         return {"description":result}
     #except Exception as e:
+    
         #raise HTTPException(status_code=500, detail=str(e))
