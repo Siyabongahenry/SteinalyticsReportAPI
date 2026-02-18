@@ -51,7 +51,7 @@ async def describe_book(book: BookRequest):
         logger.info(f" {result}")
 
 
-        return {"description":result}
+        return {"description":result["summary"]}
     #except Exception as e:
     
         #raise HTTPException(status_code=500, detail=str(e))
