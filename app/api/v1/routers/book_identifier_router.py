@@ -32,7 +32,10 @@ async def identify_book(file=Depends(ImageUploadValidator)):
 
 @router.post("/describe")
 async def describe_book(title: str = None, author: str = None, isbn: str = None):
-    try:
+    #try:
+
+        logger.info("Describe route reached") 
+        logger.info(f"Received parameters - Title: {title}, Author: {author}, ISBN: {isbn}")
 
         logger.info("describe route reached")
 
@@ -45,5 +48,5 @@ async def describe_book(title: str = None, author: str = None, isbn: str = None)
             return {"message": "No matching book found", "matched_text": result["matched_text"]}
 
         return {"description":result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    #except Exception as e:
+        #raise HTTPException(status_code=500, detail=str(e))
