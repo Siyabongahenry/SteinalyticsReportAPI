@@ -9,7 +9,7 @@ class BedrockAIClient:
             region_name=settings.region  # e.g. "us-east-1"
         )
 
-        # Use the inference profile ARN for Claude 3 Sonnet
+        # Inference profile ARN for Claude 3 Sonnet
         self.model_id = (
             "arn:aws:bedrock:us-east-1:092963739214:"
             "inference-profile/us.anthropic.claude-3-sonnet-20240229-v1:0"
@@ -32,10 +32,10 @@ class BedrockAIClient:
 
         output = json.loads(response["body"].read())
 
-        # 🔹 Log the raw response so you can inspect the structure 
-        print("Raw Bedrock response:", json.dumps(output, indent=2))
+        # 🔹 Correct extraction: look inside "content"
+        if "content" in output and output["content"]:
+            first_content = output["content"][0]
+            if first_content.get("type") == "text":
+                return first_content.get("text", "").strip()
 
-        # Claude 3.x returns output under "output" → list of dicts with "content"
-        if "output" in output and output["output"]:
-            return output["output"][0].get("content", "").strip()
         return ""
