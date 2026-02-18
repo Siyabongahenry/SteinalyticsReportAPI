@@ -7,7 +7,7 @@ class BedrockAIClient:
         # No need for access keys — boto3 will use the IAM role attached to your EC2 instance
         self.client = boto3.client(
             service_name="bedrock-runtime",
-            region_name=settings.aws_region  # e.g. "us-east-1"
+            region_name=settings.region
         )
 
         # Choose a Bedrock model available in your region/account
