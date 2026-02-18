@@ -4,15 +4,14 @@ from app.core.settings import settings
 
 class BedrockAIClient:
     def __init__(self):
-        # No need for access keys — boto3 will use the IAM role attached to your EC2 instance
+        # IAM role credentials are automatically picked up by boto3
         self.client = boto3.client(
             service_name="bedrock-runtime",
-            region_name=settings.region
+            region_name=settings.region  # e.g. "us-east-1"
         )
 
-        # Choose a Bedrock model available in your region/account
-        # Examples: "anthropic.claude-v2", "ai21.j2-mid", "amazon.titan-text-express-v1"
-        self.model_id = "anthropic.claude-v2"
+        # Use a currently active model from list-foundation-models
+        self.model_id = "anthropic.claude-sonnet-4-20250514-v1:0"
 
     def ask(self, prompt: str) -> str:
         body = json.dumps({
