@@ -8,7 +8,8 @@ class GoogleAIClient:
         # Create a client with your API key from settings
         self.client = genai.Client(api_key=settings.google_api_key)
         for model in self.client.models.list(): 
-            print(model.name, model.supported_generation_methods)
+            print(model.name)
+            print(model)
 
     def ask(self, prompt: str) -> str:
         # Use the client to generate content
